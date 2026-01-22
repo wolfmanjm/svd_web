@@ -1,0 +1,407 @@
+package assets
+
+@haml SiteLayout() {
+	!!!
+	%html{lang: "en"}
+		%head
+			%meta{content: "text/html; charset=UTF-8", http-equiv: "Content-Type"}/
+			%meta{charset: "UTF-8"}/
+			%meta{content: "width=device-width, initial-scale=1.0", name: "viewport"}/
+			%title RP2040 Peripherals &amp; Registers
+			:css
+				* {
+						margin: 0;
+						padding: 0;
+						box-sizing: border-box;
+				}
+
+				body {
+						font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+						background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+						min-height: 100vh;
+						padding: 20px;
+				}
+
+				.container {
+						max-width: 1200px;
+						margin: 0 auto;
+						background: white;
+						border-radius: 12px;
+						box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+						overflow: hidden;
+				}
+
+				header {
+						background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+						color: white;
+						padding: 30px;
+						text-align: center;
+				}
+
+				h1 {
+						font-size: 2em;
+						margin-bottom: 10px;
+				}
+
+				.subtitle {
+						opacity: 0.8;
+						font-size: 0.9em;
+				}
+
+				.search-bar {
+						padding: 20px 30px;
+						background: #f7fafc;
+						border-bottom: 1px solid #e2e8f0;
+				}
+
+				input[type="search"] {
+						width: 100%;
+						padding: 12px 20px;
+						border: 2px solid #cbd5e0;
+						border-radius: 8px;
+						font-size: 1em;
+						transition: border-color 0.3s;
+				}
+
+				input[type="search"]:focus {
+						outline: none;
+						border-color: #667eea;
+				}
+
+				.content {
+						padding: 30px;
+				}
+
+				.peripheral {
+						margin-bottom: 20px;
+						border: 1px solid #e2e8f0;
+						border-radius: 8px;
+						overflow: hidden;
+						transition: box-shadow 0.3s;
+				}
+
+				.peripheral:hover {
+						box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				}
+
+				.peripheral-header {
+						background: #edf2f7;
+						padding: 15px 20px;
+						cursor: pointer;
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+						user-select: none;
+				}
+
+				.peripheral-header:hover {
+						background: #e2e8f0;
+				}
+
+				.peripheral-name {
+						font-weight: 600;
+						font-size: 1.1em;
+						color: #2d3748;
+				}
+
+				.peripheral-address {
+						color: #718096;
+						font-family: 'Courier New', monospace;
+						font-size: 0.9em;
+				}
+
+				.toggle-icon {
+						color: #667eea;
+						font-weight: bold;
+						transition: transform 0.3s;
+				}
+
+				.peripheral.active .toggle-icon {
+						transform: rotate(180deg);
+				}
+
+				.registers {
+						display: none;
+						padding: 20px;
+						background: white;
+				}
+
+				.peripheral.active .registers {
+						display: block;
+				}
+
+				.register {
+						padding: 12px;
+						border-left: 3px solid #667eea;
+						background: #f7fafc;
+						margin-bottom: 10px;
+						border-radius: 4px;
+				}
+
+				.register-name {
+						font-weight: 600;
+						color: #2d3748;
+						font-family: 'Courier New', monospace;
+				}
+
+				.register-offset {
+						color: #718096;
+						font-size: 0.85em;
+						margin-left: 10px;
+				}
+
+				.register-desc {
+						color: #4a5568;
+						font-size: 0.9em;
+						margin-top: 5px;
+				}
+
+				.no-results {
+						text-align: center;
+						padding: 40px;
+						color: #718096;
+				}
+
+				.register-fields {
+						margin-top: 15px;
+						padding: 15px;
+						background: white;
+						border: 1px solid #e2e8f0;
+						border-radius: 6px;
+				}
+
+				.fields-header {
+						font-size: 0.85em;
+						font-weight: 600;
+						color: #4a5568;
+						margin-bottom: 10px;
+						text-transform: uppercase;
+						letter-spacing: 0.5px;
+				}
+
+				.field {
+					display: grid;
+					grid-template-columns: 80px 120px 1fr;
+					gap: 15px;
+					padding: 10px;
+					border-bottom: 1px solid #f7fafc;
+					align-items: start;
+				}
+
+				.field:last-child {
+					border-bottom: none;
+				}
+
+				.field:hover {
+					background: #f7fafc;
+				}
+
+				.field-bits {
+					font-family: 'Courier New', monospace;
+					font-weight: 600;
+					color: #667eea;
+					font-size: 0.9em;
+				}
+
+				.field-name {
+					font-family: 'Courier New', monospace;
+					font-weight: 600;
+					color: #2d3748;
+					font-size: 0.9em;
+				}
+
+				.field-desc {
+					color: #4a5568;
+					font-size: 0.85em;
+					line-height: 1.5;
+				}
+
+				.field-access {
+					display: inline-block;
+					padding: 2px 8px;
+					background: #e6fffa;
+					color: #047857;
+					border-radius: 4px;
+					font-size: 0.75em;
+					font-weight: 600;
+					margin-left: 8px;
+				}
+
+				.field-access.ro {
+					background: #fef3c7;
+					color: #92400e;
+				}
+
+				.field-access.wo {
+					background: #dbeafe;
+					color: #1e40af;
+				}
+		%body
+			.container
+				%header
+					%h1 RP2040 Peripherals &amp; Registers
+					%p.subtitle Reference Guide for Raspberry Pi Pico Microcontroller
+				.search-bar
+					%input#searchInput{placeholder: "Search peripherals or registers...", type: "search"}/
+				.content
+					.peripheral{data-name: "UART0"}
+						.peripheral-header
+							%div
+								%span.peripheral-name UART0
+								%span.peripheral-address 0x40034000
+							%span.toggle-icon ▼
+						.registers
+							.register
+								.register-name
+									UARTDR
+									%span.register-offset 0x000
+								.register-desc Data Register - Read/Write data
+							.register
+								.register-name
+									UARTFR
+									%span.register-offset 0x018
+								.register-desc Flag Register - Status flags
+
+								.register-fields
+									.fields-header Bit Fields
+									.field
+										.field-bits [7]
+										.field-name
+										TXFE
+										%span.field-access.ro RO
+										.field-desc Transmit FIFO empty. Set when transmit FIFO is empty.
+									.field
+										.field-bits [6]
+										.field-name
+										RXFF
+										%span.field-access.ro RO
+										.field-desc Receive FIFO full. Set when receive FIFO is full.
+									.field
+										.field-bits [5]
+										.field-name
+										TXFF
+										%span.field-access.ro RO
+										.field-desc Transmit FIFO full. Set when transmit FIFO is full.
+									.field
+										.field-bits [4]
+										.field-name
+										RXFE
+										%span.field-access.ro RO
+										.field-desc Receive FIFO empty. Set when receive FIFO is empty.
+									.field
+										.field-bits [3]
+										.field-name
+										BUSY
+										%span.field-access.ro RO
+										.field-desc UART busy transmitting data.
+									.field
+										.field-bits [2:0]
+										.field-name
+										RSVD
+										%span.field-access.ro RO
+										.field-desc Reserved bits.
+
+							.register
+								.register-name
+									UARTIBRD
+									%span.register-offset 0x024
+								.register-desc Integer Baud Rate Divisor
+
+					.peripheral{data-name: "GPIO"}
+						.peripheral-header
+							%div
+								%span.peripheral-name GPIO
+								%span.peripheral-address 0x40014000
+							%span.toggle-icon ▼
+						.registers
+							.register
+								.register-name
+									GPIO_OUT
+									%span.register-offset 0x010
+								.register-desc GPIO output value
+							.register
+								.register-name
+									GPIO_OE
+									%span.register-offset 0x020
+								.register-desc GPIO output enable
+							.register
+								.register-name
+									GPIO_IN
+									%span.register-offset 0x004
+								.register-desc GPIO input value
+					.peripheral{data-name: "SPI0"}
+						.peripheral-header
+							%div
+								%span.peripheral-name SPI0
+								%span.peripheral-address 0x4003C000
+							%span.toggle-icon ▼
+						.registers
+							.register
+								.register-name
+									SSPCR0
+									%span.register-offset 0x000
+								.register-desc Control Register 0
+							.register
+								.register-name
+									SSPDR
+									%span.register-offset 0x008
+								.register-desc Data Register
+							.register
+								.register-name
+									SSPSR
+									%span.register-offset 0x00C
+								.register-desc Status Register
+					.peripheral{data-name: "I2C0"}
+						.peripheral-header
+							%div
+								%span.peripheral-name I2C0
+								%span.peripheral-address 0x40044000
+							%span.toggle-icon ▼
+						.registers
+							.register
+								.register-name
+									IC_CON
+									%span.register-offset 0x000
+								.register-desc Control Register
+							.register
+								.register-name
+									IC_DATA_CMD
+									%span.register-offset 0x010
+								.register-desc Data Buffer and Command Register
+							.register
+								.register-name
+									IC_STATUS
+									%span.register-offset 0x070
+								.register-desc Status Register
+					.no-results{style: "display: none;"} No matching peripherals or registers found.
+			:javascript
+				const peripherals = document.querySelectorAll('.peripheral');
+				const searchInput = document.getElementById('searchInput');
+				const noResults = document.querySelector('.no-results');
+
+				peripherals.forEach(peripheral => {
+						const header = peripheral.querySelector('.peripheral-header');
+						header.addEventListener('click', () => {
+								peripheral.classList.toggle('active');
+						});
+				});
+
+				searchInput.addEventListener('input', (e) => {
+						const searchTerm = e.target.value.toLowerCase();
+						let visibleCount = 0;
+
+						peripherals.forEach(peripheral => {
+								const name = peripheral.dataset.name.toLowerCase();
+								const text = peripheral.textContent.toLowerCase();
+
+								if (text.includes(searchTerm)) {
+										peripheral.style.display = 'block';
+										visibleCount++;
+								} else {
+										peripheral.style.display = 'none';
+								}
+						});
+
+						noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+				});
+}
