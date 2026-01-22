@@ -1,9 +1,8 @@
-package main
+package svd_server
 
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -14,7 +13,7 @@ import (
 
 var useBrowser bool = false
 
-func main() {
+func Server(cstr string) error {
 
 	if useBrowser {
 		mux := http.NewServeMux()
@@ -25,7 +24,7 @@ func main() {
 
 		fmt.Println("Server starting on port 8080...")
 		if err := http.ListenAndServe(":8080", mux); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	} else {
 		periphs := []string {"Uart0", "Uart1", "SPI0", "SPI1"}
@@ -33,16 +32,13 @@ func main() {
 		//assets.SiteLayout().Render(context.Background(), os.Stdout)
 	}
 
-	err := run()
-	if err != nil {
-		panic(err)
-	}
+	return run(cstr)
 }
 
-func run() error {
+func run(cstr string) error {
 	ctx := context.Background()
 
-	conn, err := pgx.Connect(ctx, "host=localhost port=5432 user=morris password=test dbname=svd sslmode=disable")
+	conn, err := pgx.Connect(ctx, cstr)
 	if err != nil {
 		return err
 	}
@@ -55,7 +51,11 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	log.Println(mpus)
+
+	fmt.Println("This database supports the following MPUs")
+	for _, m := range mpus {
+		fmt.Println(m.Name)
+	}
 
 	return nil
 }

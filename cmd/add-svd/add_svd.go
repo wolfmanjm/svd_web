@@ -1,4 +1,4 @@
-package main
+package send_svd
 
 import (
 	"context"
@@ -16,18 +16,15 @@ import (
 )
 
 // This transfers the data in the local svd database to the postgresql database
-func main() {
-	if len(os.Args) != 2 {
-		panic("Local database name required")
-	}
-	fn := os.Args[1]
-	err := run(fn)
+func AddSVD(url, fn string) error {
+	err := run(url, fn)
 	if err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }
 
-func run(fn string) error {
+func run(url, fn string) error {
 	// open the local database
 	ldb, err := OpenLocalDatabase(fn)
 	if err != nil {
@@ -41,9 +38,8 @@ func run(fn string) error {
 
 	mpu_id := mpus[0].id
 
-
 	ctx := context.Background()
-	conn, err := pgx.Connect(ctx, "host=pi5.local port=5432 user=morris password=test dbname=svd sslmode=disable")
+	conn, err := pgx.Connect(ctx, url)
 	if err != nil {
 		return err
 	}
@@ -95,13 +91,6 @@ func run(fn string) error {
 			return fmt.Errorf("Error in populate_registers - %w", err)
 		}
 	}
-
-	// list all mpus
-	x, err := queries.ListMPUs(ctx)
-	if err != nil {
-		return err
-	}
-	fmt.Println(x)
 
 	return nil
 }
