@@ -4,7 +4,10 @@ genassets:
 
 .PHONY: migrate
 migrate:
-	goose postgres "host=localhost port=5432 user=morris password=test dbname=svd sslmode=disable" -dir database up
+	goose postgres "host=pi5.local port=5432 user=morris password=test dbname=svd sslmode=disable" -dir data/sql/migrations up
+.PHONY: down
+down:
+	goose postgres "host=pi5.local port=5432 user=morris password=test dbname=svd sslmode=disable" -dir data/sql/migrations down
 
 .PHONY: generate
 generate:

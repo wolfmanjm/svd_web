@@ -51,7 +51,7 @@ func run() error {
 	queries := dbstore.New(conn)
 
 	// list all mpus
-	mpus, err := queries.ListMCUs(ctx)
+	mpus, err := queries.ListMPUs(ctx)
 	if err != nil {
 		return err
 	}

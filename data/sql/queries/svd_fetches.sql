@@ -1,2 +1,2 @@
--- name: ListMCUs :many
+-- name: ListMPUs :many
 SELECT * FROM mpus ORDER BY name;

@@ -9,12 +9,12 @@ import (
 	"context"
 )
 
-const listMCUs = `-- name: ListMCUs :many
+const listMPUs = `-- name: ListMPUs :many
 SELECT id, name, description FROM mpus ORDER BY name
 `
 
-func (q *Queries) ListMCUs(ctx context.Context) ([]Mpu, error) {
-	rows, err := q.db.Query(ctx, listMCUs)
+func (q *Queries) ListMPUs(ctx context.Context) ([]Mpu, error) {
+	rows, err := q.db.Query(ctx, listMPUs)
 	if err != nil {
 		return nil, err
 	}
