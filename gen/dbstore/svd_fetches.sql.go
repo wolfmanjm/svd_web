@@ -7,7 +7,49 @@ package dbstore
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+const fetchPeripherals = `-- name: FetchPeripherals :many
+SELECT id, derived_from_id, name, base_address, description
+FROM peripherals WHERE mpu_id = $1
+ORDER BY name
+`
+
+type FetchPeripheralsRow struct {
+	ID            int32
+	DerivedFromID pgtype.Int4
+	Name          string
+	BaseAddress   string
+	Description   pgtype.Text
+}
+
+func (q *Queries) FetchPeripherals(ctx context.Context, mpuID int32) ([]FetchPeripheralsRow, error) {
+	rows, err := q.db.Query(ctx, fetchPeripherals, mpuID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FetchPeripheralsRow
+	for rows.Next() {
+		var i FetchPeripheralsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.DerivedFromID,
+			&i.Name,
+			&i.BaseAddress,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
 
 const listMPUs = `-- name: ListMPUs :many
 SELECT id, name, description FROM mpus ORDER BY name

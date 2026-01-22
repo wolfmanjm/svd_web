@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/wolfmanjm/svd_web/assets"
@@ -52,9 +53,24 @@ func run(cstr string) error {
 		return err
 	}
 
+	// example of etting all the MPUs in the database
 	fmt.Println("This database supports the following MPUs")
 	for _, m := range mpus {
 		fmt.Println(m.Name)
+	}
+
+	// example of accessing al the peripherals for a MCU
+	for _, m := range mpus {
+		p, err := queries.FetchPeripherals(ctx, m.ID)
+		if err != nil {
+			return err
+		}
+		fmt.Println("Peripherals for ", m.Name)
+		var names []string
+		for _, x := range p {
+			names = append(names, x.Name)
+		}
+		fmt.Println(strings.Join(names, ", "))
 	}
 
 	return nil

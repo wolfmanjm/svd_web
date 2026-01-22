@@ -30,6 +30,7 @@ func run(url, fn string) error {
 	if err != nil {
 		return err
 	}
+	defer CloseLocalDatabase(ldb)
 
 	mpus, err := fetch_mpus(ldb)
 	if err != nil {
@@ -230,22 +231,6 @@ func OpenLocalDatabase(dbfn string) (*sql.DB, error) {
 
 func CloseLocalDatabase(db *sql.DB) {
 	db.Close()
-}
-
-func IntPow(base, exp int) int {
-    result := 1
-    for {
-        if exp & 1 == 1 {
-            result *= base
-        }
-        exp >>= 1
-        if exp == 0 {
-            break
-        }
-        base *= base
-    }
-
-    return result
 }
 
 // collect all the registers and their fields for the named peripheral
