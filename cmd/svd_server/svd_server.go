@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/wolfmanjm/svd_web/assets"
@@ -102,6 +103,29 @@ func run(cstr string) error {
 	}
 	fmt.Println(strings.Join(names, ", "))
 
+	// Example of accessing all the fields for a register
+	reg := "uartcr"
+	fmt.Printf("\nFields for register %s, peripheral %s of %s\n", reg, periph, m.Name)
+
+	fr := dbstore.FindRegisterParams {
+		PeripheralID: p.ID,
+		Name: reg,
+	}
+	r1, err := queries.FindRegister(ctx, fr)
+	if err != nil {
+		return fmt.Errorf("find Register %s - %w", reg, err)
+	}
+
+	fields, err := queries.FetchFields(ctx, r1.ID)
+	if err != nil {
+		return fmt.Errorf("fetch Feilds for register %s - %w", r1.Name, err)
+	}
+	w := tabwriter.NewWriter(os.Stdout, 10, 4, 2, ' ', tabwriter.TabIndent)
+	fmt.Fprintln(w, "Name\tNumBits\tBitOffset\tDescription")
+	for _, f := range fields {
+		fmt.Fprintf(w, "%s\t%d\t%d\t%s\n", f.Name, f.NumBits, f.BitOffset, f.Description.String[0:80])
+	}
+	w.Flush()
 
 	return nil
 }
