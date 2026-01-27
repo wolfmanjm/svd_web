@@ -5,11 +5,12 @@ import (
 	"fmt"
 	add_svd "github.com/wolfmanjm/svd_web/cmd/add-svd"
 	svd_server "github.com/wolfmanjm/svd_web/cmd/svd_server"
+	test_svd "github.com/wolfmanjm/svd_web/cmd/test_svd"
 )
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: main [add|serve] [dbfn]")
+		fmt.Println("Usage: main [add|serve|test] [dbfn]")
 		os.Exit(0)
 	}
 
@@ -26,6 +27,14 @@ func main() {
 			os.Exit(1)
 		}
 		err := add_svd.AddSVD(url, os.Args[2])
+		if err != nil {
+			panic(err)
+		}
+		os.Exit(0)
+	}
+
+	if cmd == "test" {
+		err := test_svd.Test(url)
 		if err != nil {
 			panic(err)
 		}
