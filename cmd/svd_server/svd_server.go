@@ -59,7 +59,7 @@ func run(cstr string) error {
 		fmt.Println(m.Name)
 	}
 
-	// example of accessing al the peripherals for a MCU
+	// example of accessing all the peripherals for a MCU
 	for _, m := range mpus {
 		p, err := queries.FetchPeripherals(ctx, m.ID)
 		if err != nil {
@@ -72,6 +72,36 @@ func run(cstr string) error {
 		}
 		fmt.Println(strings.Join(names, ", "))
 	}
+
+	// example of accessing all the registers for a peripheral of a mcu
+	mpu := "rp2350"
+	m, err := queries.FindMCU(ctx, mpu)
+	if err != nil {
+		return fmt.Errorf("find MCU %s - %w", mpu, err)
+	}
+
+	periph := "uart0"
+	fmt.Printf("\nRegisters for peripheral %s of %s\n", periph, m.Name)
+
+	f := dbstore.FindPeripheralParams {
+		MpuID: m.ID,
+		Name: periph,
+	}
+	p, err := queries.FindPeripheral(ctx, f)
+	if err != nil {
+		return fmt.Errorf("find Peripheral %s - %w", periph, err)
+	}
+
+	r, err := queries.FetchRegisters(ctx, p.ID)
+	if err != nil {
+		return fmt.Errorf("fetch Registers for peripheral %s - %w", periph, err)
+	}
+	var names []string
+	for _, x := range r {
+		names = append(names, x.Name)
+	}
+	fmt.Println(strings.Join(names, ", "))
+
 
 	return nil
 }

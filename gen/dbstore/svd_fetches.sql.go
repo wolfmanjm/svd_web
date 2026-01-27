@@ -7,35 +7,59 @@ package dbstore
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const fetchFields = `-- name: FetchFields :many
+SELECT id, register_id, name, num_bits, bit_offset, description
+FROM fields WHERE register_id = $1
+ORDER BY bit_offset
+`
+
+func (q *Queries) FetchFields(ctx context.Context, registerID int32) ([]Field, error) {
+	rows, err := q.db.Query(ctx, fetchFields, registerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Field
+	for rows.Next() {
+		var i Field
+		if err := rows.Scan(
+			&i.ID,
+			&i.RegisterID,
+			&i.Name,
+			&i.NumBits,
+			&i.BitOffset,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const fetchPeripherals = `-- name: FetchPeripherals :many
-SELECT id, derived_from_id, name, base_address, description
+SELECT id, mpu_id, derived_from_id, name, base_address, description
 FROM peripherals WHERE mpu_id = $1
 ORDER BY name
 `
 
-type FetchPeripheralsRow struct {
-	ID            int32
-	DerivedFromID pgtype.Int4
-	Name          string
-	BaseAddress   string
-	Description   pgtype.Text
-}
-
-func (q *Queries) FetchPeripherals(ctx context.Context, mpuID int32) ([]FetchPeripheralsRow, error) {
+func (q *Queries) FetchPeripherals(ctx context.Context, mpuID int32) ([]Peripheral, error) {
 	rows, err := q.db.Query(ctx, fetchPeripherals, mpuID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []FetchPeripheralsRow
+	var items []Peripheral
 	for rows.Next() {
-		var i FetchPeripheralsRow
+		var i Peripheral
 		if err := rows.Scan(
 			&i.ID,
+			&i.MpuID,
 			&i.DerivedFromID,
 			&i.Name,
 			&i.BaseAddress,
@@ -51,8 +75,81 @@ func (q *Queries) FetchPeripherals(ctx context.Context, mpuID int32) ([]FetchPer
 	return items, nil
 }
 
+const fetchRegisters = `-- name: FetchRegisters :many
+SELECT id, peripheral_id, name, address_offset, reset_value, description
+FROM registers WHERE peripheral_id = $1
+ORDER BY name
+`
+
+func (q *Queries) FetchRegisters(ctx context.Context, peripheralID int32) ([]Register, error) {
+	rows, err := q.db.Query(ctx, fetchRegisters, peripheralID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Register
+	for rows.Next() {
+		var i Register
+		if err := rows.Scan(
+			&i.ID,
+			&i.PeripheralID,
+			&i.Name,
+			&i.AddressOffset,
+			&i.ResetValue,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findMCU = `-- name: FindMCU :one
+SELECT id, name, description
+FROM mpus
+WHERE lower(name) LIKE lower($1::text)
+`
+
+func (q *Queries) FindMCU(ctx context.Context, name string) (Mpu, error) {
+	row := q.db.QueryRow(ctx, findMCU, name)
+	var i Mpu
+	err := row.Scan(&i.ID, &i.Name, &i.Description)
+	return i, err
+}
+
+const findPeripheral = `-- name: FindPeripheral :one
+SELECT id, mpu_id, derived_from_id, name, base_address, description
+FROM peripherals
+WHERE mpu_id = $1 AND lower(name) LIKE lower($2::text)
+`
+
+type FindPeripheralParams struct {
+	MpuID int32
+	Name  string
+}
+
+func (q *Queries) FindPeripheral(ctx context.Context, arg FindPeripheralParams) (Peripheral, error) {
+	row := q.db.QueryRow(ctx, findPeripheral, arg.MpuID, arg.Name)
+	var i Peripheral
+	err := row.Scan(
+		&i.ID,
+		&i.MpuID,
+		&i.DerivedFromID,
+		&i.Name,
+		&i.BaseAddress,
+		&i.Description,
+	)
+	return i, err
+}
+
 const listMPUs = `-- name: ListMPUs :many
-SELECT id, name, description FROM mpus ORDER BY name
+SELECT id, name, description
+FROM mpus
+ORDER BY name
 `
 
 func (q *Queries) ListMPUs(ctx context.Context) ([]Mpu, error) {

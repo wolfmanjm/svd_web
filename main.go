@@ -23,13 +23,13 @@ func main() {
 	if cmd == "add" {
 		if len(os.Args) < 3 {
 			fmt.Println("Usage: main add dbfn")
-			os.Exit(0)
+			os.Exit(1)
 		}
 		err := add_svd.AddSVD(url, os.Args[2])
 		if err != nil {
 			panic(err)
 		}
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	err := svd_server.Server(url)

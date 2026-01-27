@@ -57,7 +57,7 @@ func run(url, fn string) error {
 
 	r_mpuid, err := queries.AddMCU(ctx, m)
 	if err != nil {
-		return fmt.Errorf("Failed to add MCU: %w", err)
+		return fmt.Errorf("failed to add MCU: %w", err)
 	}
 	periphs, err := fetch_peripherals(ldb, mpu_id)
 	if err != nil {
@@ -77,19 +77,19 @@ func run(url, fn string) error {
 
 		r_pid, err := queries.AddPeripheral(ctx, r_p)
 		if err != nil {
-			return fmt.Errorf("Failed to add Peripheral for mpu_id %d - %w", r_mpuid, err)
+			return fmt.Errorf("failed to add Peripheral for mpu_id %d - %w", r_mpuid, err)
 		}
 
 		// This collects all the registers and their fields
 		pr, err := collect_registers(ldb, mpu_id, p.id)
 		if err != nil {
-			return fmt.Errorf("Error in collect registers - %w", err)
+			return fmt.Errorf("error in collect registers - %w", err)
 		}
 
 		// this will populate the registers and their fields
 		err = populate_registers(ctx, queries, r_pid, pr.registers)
 		if err != nil {
-			return fmt.Errorf("Error in populate_registers - %w", err)
+			return fmt.Errorf("error in populate_registers - %w", err)
 		}
 	}
 
@@ -111,12 +111,12 @@ func populate_registers(ctx context.Context, queries *dbstore.Queries, pid int32
 
 		r_rid, err := queries.AddRegister(ctx, rparams)
 		if err != nil {
-			return fmt.Errorf("Failed to Add Register %s for peripheral_id %d - %w", r.name, pid, err)
+			return fmt.Errorf("failed to Add Register %s for peripheral_id %d - %w", r.name, pid, err)
 		}
 
 		err = populate_fields(ctx, queries, r_rid, r.fields)
 		if err != nil {
-			return fmt.Errorf("Error in populate_fields - %w", err)
+			return fmt.Errorf("error in populate_fields - %w", err)
 		}
 	}
 
@@ -136,7 +136,7 @@ func populate_fields(ctx context.Context, queries *dbstore.Queries, rid int32, f
 		}
 		_, err := queries.AddField(ctx, fparams)
 		if err != nil {
-			return fmt.Errorf("Failed to Add Field %s for register_id %d - %w", f.name, rid, err)
+			return fmt.Errorf("failed to Add Field %s for register_id %d - %w", f.name, rid, err)
 		}
 	}
 
@@ -214,16 +214,16 @@ func OpenLocalDatabase(dbfn string) (*sql.DB, error) {
 	fn := "file:" + dbfn + "?mode=ro"
 	db, err := sql.Open("sqlite", fn)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to open database file %v - %w", dbfn, err)
+		return nil, fmt.Errorf("unable to open database file %v - %w", dbfn, err)
 	}
 	// makes sure the database is ok
 	mpus, err := fetch_mpus(db)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to get MPUs, is the database valid? - %w", err)
+		return nil, fmt.Errorf("unable to get MPUs, is the database valid? - %w", err)
 	}
 
 	if len(mpus) < 1 {
-		return nil, errors.New("No MPUs in database")
+		return nil, errors.New("no MPUs in database")
 	}
 
 	return db, nil
