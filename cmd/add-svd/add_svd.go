@@ -48,6 +48,13 @@ func run(url, fn string) error {
 
 	queries := dbstore.New(conn)
 
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	qtx := queries.WithTx(tx)
+
 	// now populate the psql database
 	fmt.Println("Populating MPU: ", mpus[0].name)
 	m := dbstore.AddMCUParams{
@@ -55,7 +62,7 @@ func run(url, fn string) error {
 		Description: pgtype.Text {String: mpus[0].description.V, Valid: mpus[0].description.Valid},
 	}
 
-	r_mpuid, err := queries.AddMCU(ctx, m)
+	r_mpuid, err := qtx.AddMCU(ctx, m)
 	if err != nil {
 		return fmt.Errorf("failed to add MCU: %w", err)
 	}
@@ -91,7 +98,7 @@ func run(url, fn string) error {
 			Description: pgtype.Text { String: p.description.V, Valid: p.description.Valid },
 		}
 
-		r_pid, err := queries.AddPeripheral(ctx, r_p)
+		r_pid, err := qtx.AddPeripheral(ctx, r_p)
 		if err != nil {
 			return fmt.Errorf("failed to add Peripheral for mpu_id %d - %w", r_mpuid, err)
 		}
@@ -107,14 +114,14 @@ func run(url, fn string) error {
 			}
 
 			// this will populate the registers and their fields
-			err = populate_registers(ctx, queries, r_pid, pr.registers)
+			err = populate_registers(ctx, qtx, r_pid, pr.registers)
 			if err != nil {
 				return fmt.Errorf("error in populate_registers - %w", err)
 			}
 		}
 	}
 
-	return nil
+	return tx.Commit(ctx)
 }
 
 func populate_registers(ctx context.Context, queries *dbstore.Queries, pid int32, registers *[]Register) error {
@@ -311,7 +318,7 @@ func fetch_mpus(db *sql.DB) ([]MPU, error) {
 
 func fetch_peripherals(db *sql.DB, mpu_id int) ([]Peripheral, error) {
 	var periphs []Peripheral
-	periph_rows, err := db.Query("select id, derived_from_id, name, base_address, description from peripherals WHERE mpu_id = ? ORDER BY name", mpu_id)
+	periph_rows, err := db.Query("select id, derived_from_id, name, base_address, description from peripherals WHERE mpu_id = ?", mpu_id)
 	if err != nil {
 		return periphs, err
 	}
