@@ -47,11 +47,13 @@ func (db *Database) GetMpus() ([]dbstore.Mpu, error) {
 	return mpus, nil
 }
 
+// return the single MCU with the given ID
 func (db *Database) GetMpu(id int32) dbstore.Mpu {
 	m, _ := db.queries.GetMCU(db.ctx, id)
 	return m
 }
 
+// return the peripherals for the given MCUID
 func (db *Database) GetPeripherals(id int32) ([]dbstore.Peripheral, error) {
 	p, err := db.queries.FetchPeripherals(db.ctx, id)
 	if err != nil {
@@ -60,11 +62,13 @@ func (db *Database) GetPeripherals(id int32) ([]dbstore.Peripheral, error) {
 	return p, nil
 }
 
+// return the single peripheral given the ID
 func (db *Database) GetPeripheral(pid int32) dbstore.Peripheral {
 	p, _ := db.queries.GetPeripheral(db.ctx, pid)
 	return p
 }
 
+// Get registers for the specified peripheral, will follow the DerivedFrom field if needed
 func (db *Database) GetRegisters(pid int32) ([]dbstore.Register, error) {
 	// if this peripheral is derived from, then we need to get the registers from that peripheral
 	p := db.GetPeripheral(pid)
@@ -77,6 +81,22 @@ func (db *Database) GetRegisters(pid int32) ([]dbstore.Register, error) {
 		return r, fmt.Errorf("fetch Registers - %w", err)
 	}
 	return r, nil
+}
+
+// return the single register given the ID
+func (db *Database) GetRegister(rid int32) dbstore.Register {
+	r, _ := db.queries.GetRegister(db.ctx, rid)
+	return r
+}
+
+// Get fields for the specified register
+func (db *Database) GetFields(rid int32) ([]dbstore.Field, error) {
+
+	fields, err := db.queries.FetchFields(db.ctx, rid)
+	if err != nil {
+		return fields, fmt.Errorf("fetch Fields - %w", err)
+	}
+	return fields, nil
 }
 
 func (db *Database) DoStuff() error {

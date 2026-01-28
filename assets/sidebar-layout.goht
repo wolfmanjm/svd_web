@@ -225,6 +225,10 @@ func firstLine(str string) string {
 						background: #f7fafc;
 						margin-bottom: 10px;
 						border-radius: 4px;
+						transition: box-shadow 0.3s;
+				}
+				.register:hover {
+						box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 				}
 
 				.register-name {
@@ -278,14 +282,6 @@ func firstLine(str string) string {
 					align-items: start;
 				}
 
-				.field:last-child {
-					border-bottom: none;
-				}
-
-				.field:hover {
-					background: #f7fafc;
-				}
-
 				.field-bits {
 					font-family: 'Courier New', monospace;
 					font-weight: 600;
@@ -303,28 +299,7 @@ func firstLine(str string) string {
 				.field-desc {
 					color: #4a5568;
 					font-size: 0.85em;
-					line-height: 1.5;
-				}
-
-				.field-access {
-					display: inline-block;
-					padding: 2px 8px;
-					background: #e6fffa;
-					color: #047857;
-					border-radius: 4px;
-					font-size: 0.75em;
-					font-weight: 600;
-					margin-left: 8px;
-				}
-
-				.field-access.ro {
-					background: #fef3c7;
-					color: #92400e;
-				}
-
-				.field-access.wo {
-					background: #dbeafe;
-					color: #1e40af;
+					white-space: pre-line;
 				}
 
 		%body

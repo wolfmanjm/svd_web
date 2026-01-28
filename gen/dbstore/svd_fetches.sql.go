@@ -204,6 +204,26 @@ func (q *Queries) GetPeripheral(ctx context.Context, id int32) (Peripheral, erro
 	return i, err
 }
 
+const getRegister = `-- name: GetRegister :one
+SELECT id, peripheral_id, name, address_offset, reset_value, description
+FROM registers
+WHERE id = $1
+`
+
+func (q *Queries) GetRegister(ctx context.Context, id int32) (Register, error) {
+	row := q.db.QueryRow(ctx, getRegister, id)
+	var i Register
+	err := row.Scan(
+		&i.ID,
+		&i.PeripheralID,
+		&i.Name,
+		&i.AddressOffset,
+		&i.ResetValue,
+		&i.Description,
+	)
+	return i, err
+}
+
 const listMPUs = `-- name: ListMPUs :many
 SELECT id, name, description
 FROM mpus

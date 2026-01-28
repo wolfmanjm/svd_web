@@ -9,9 +9,10 @@ import "github.com/stackus/goht"
 import (
 	"fmt"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
+	"github.com/wolfmanjm/svd_web/internal/database"
 )
 
-func ShowPeripherals(mpuname string, periphs []dbstore.Peripheral) goht.Template {
+func ShowPeripherals(mpuname string, db *database.Database, periphs []dbstore.Peripheral) goht.Template {
 	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
 		__buf, __isBuf := __w.(goht.Buffer)
 		if !__isBuf {
@@ -71,15 +72,31 @@ func ShowPeripherals(mpuname string, periphs []dbstore.Peripheral) goht.Template
 			if _, __err = __buf.WriteString("</span>\n"); __err != nil {
 				return
 			}
+			if p.DerivedFromID.Valid {
+				p2 := db.GetPeripheral(p.DerivedFromID.Int32)
+				if _, __err = __buf.WriteString("<span class=\"peripheral-description\">Same as "); __err != nil {
+					return
+				}
+				var __var4 string
+				if __var4, __err = goht.CaptureErrors(goht.EscapeString(p2.Name)); __err != nil {
+					return
+				}
+				if _, __err = __buf.WriteString(__var4); __err != nil {
+					return
+				}
+				if _, __err = __buf.WriteString("</span>\n"); __err != nil {
+					return
+				}
+			}
 			if p.Description.Valid {
 				if _, __err = __buf.WriteString("<br><span class=\"peripheral-description\">"); __err != nil {
 					return
 				}
-				var __var4 string
-				if __var4, __err = goht.CaptureErrors(goht.EscapeString(p.Description.String)); __err != nil {
+				var __var5 string
+				if __var5, __err = goht.CaptureErrors(goht.EscapeString(p.Description.String)); __err != nil {
 					return
 				}
-				if _, __err = __buf.WriteString(__var4); __err != nil {
+				if _, __err = __buf.WriteString(__var5); __err != nil {
 					return
 				}
 				if _, __err = __buf.WriteString("</span>\n"); __err != nil {

@@ -7,6 +7,7 @@ import "context"
 import "io"
 import "github.com/stackus/goht"
 import (
+	"fmt"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
 )
 
@@ -45,7 +46,13 @@ func ShowRegisters(mpuname, pername string, regs []dbstore.Register) goht.Templa
 		}
 		for _, r := range regs {
 			name := r.Name
-			if _, __err = __buf.WriteString("<div class=\"register\">\n<span class=\"register-name\">"); __err != nil {
+			if _, __err = __buf.WriteString("<div class=\"register\" hx-get=\""); __err != nil {
+				return
+			}
+			if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/fields/%d", r.ID)) + "\""); __err != nil {
+				return
+			}
+			if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\">\n<span class=\"register-name\">"); __err != nil {
 				return
 			}
 			var __var3 string

@@ -1,0 +1,31 @@
+package assets
+import (
+	"fmt"
+	"github.com/wolfmanjm/svd_web/gen/dbstore"
+	"github.com/wolfmanjm/svd_web/internal/database"
+)
+
+func displayBits(numbits, offset int32) string {
+	bs := offset
+	be := offset + numbits-1
+	if bs == be {
+		return fmt.Sprintf("[%v]", bs)
+	}
+	return fmt.Sprintf("[%v:%v]", be, bs)
+}
+
+@haml ShowFields(db *database.Database, fields []dbstore.Field) {
+	- r := db.GetRegister(fields[0].RegisterID)
+	- p := db.GetPeripheral(r.PeripheralID)
+	- m := db.GetMpu(p.MpuID)
+	%header
+		%h1 Bit Fields for #{r.Name} of #{p.Name}
+		%p.subtitle Reference Guide for #{m.Name}
+	.register-fields
+		- for _, f := range fields
+			.field
+				.field-bits= displayBits(f.NumBits, f.BitOffset)
+				.field-name #{f.Name}
+			- if f.Description.Valid
+				.field-desc #{f.Description.String}
+}

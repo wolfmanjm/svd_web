@@ -37,5 +37,8 @@ add:			## Add a SVD to the database name=xxx
 serve: assets		## Run the server
 	go run main.go serve
 
+check:              ## do a static check on the entore project
+	staticcheck ./...
+
 help:           	## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'

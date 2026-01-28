@@ -33,7 +33,8 @@ func Server(cstr string) error {
 		periphs, err := db.GetPeripherals(int32(id))
 		if err == nil && len(periphs) > 0 {
 			mpu := db.GetMpu(int32(id))
-			assets.ShowPeripherals(mpu.Name, periphs).Render(r.Context(), w)
+			// We have to pass in the db so it can lookup the name of a derived from peripheral
+			assets.ShowPeripherals(mpu.Name, db, periphs).Render(r.Context(), w)
 		} else {
 			http.NotFound(w, r)
 			// http.Error(w, "Peripheral not found", 404)
@@ -43,6 +44,7 @@ func Server(cstr string) error {
 	mux.HandleFunc("/registers/{id}", func(w http.ResponseWriter, r *http.Request) {
 		idString := r.PathValue("id")
 		pid, _ := strconv.Atoi(idString)
+		// Note this will get registers from a Derived From peripheral if needed
 		regs, err := db.GetRegisters(int32(pid))
 		if err == nil && len(regs) > 0 {
 			p := db.GetPeripheral(int32(pid))
@@ -51,6 +53,18 @@ func Server(cstr string) error {
 		} else {
 			http.NotFound(w, r)
 			// http.Error(w, "Register not found", 404)
+		}
+	})
+
+	mux.HandleFunc("/fields/{id}", func(w http.ResponseWriter, r *http.Request) {
+		idString := r.PathValue("id")
+		id, _ := strconv.Atoi(idString)
+		f, err := db.GetFields(int32(id))
+		if err == nil && len(f) > 0 {
+			assets.ShowFields(db, f).Render(r.Context(), w)
+		} else {
+			http.NotFound(w, r)
+			// http.Error(w, "Peripheral not found", 404)
 		}
 	})
 

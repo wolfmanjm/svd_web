@@ -2,9 +2,10 @@ package assets
 import (
 	"fmt"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
+	"github.com/wolfmanjm/svd_web/internal/database"
 )
 
-@haml ShowPeripherals(mpuname string, periphs []dbstore.Peripheral) {
+@haml ShowPeripherals(mpuname string, db *database.Database, periphs []dbstore.Peripheral) {
 	%header
 		%h1 Peripherals
 		%p.subtitle Reference Guide for #{mpuname}
@@ -16,6 +17,9 @@ import (
 			%div
 				%span.peripheral-name #{name}
 				%span.peripheral-address #{p.BaseAddress}
+				- if p.DerivedFromID.Valid
+					- p2 := db.GetPeripheral(p.DerivedFromID.Int32)
+						%span.peripheral-description Same as #{p2.Name}
 				- if p.Description.Valid
 					%br
 					%span.peripheral-description #{p.Description.String}

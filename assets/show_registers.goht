@@ -1,5 +1,6 @@
 package assets
 import (
+	"fmt"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
 )
 
@@ -11,7 +12,7 @@ import (
 	.registers
 		- for _, r := range regs
 			- name := r.Name
-			.register
+			.register{"hx-get": #{fmt.Sprintf("/fields/%d", r.ID)}, "hx-swap": "innerHTML", "hx-target": "#contentArea.content"}
 				%span.register-name #{name}
 				%span.register-offset Address Offset #{r.AddressOffset}
 				- if r.ResetValue.Valid

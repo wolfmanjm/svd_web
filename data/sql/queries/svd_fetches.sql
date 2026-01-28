@@ -38,6 +38,11 @@ SELECT *
 FROM registers
 WHERE peripheral_id = $1 AND lower(name) LIKE lower(@name::text);
 
+-- name: GetRegister :one
+SELECT *
+FROM registers
+WHERE id = $1;
+
 -- name: FetchFields :many
 SELECT *
 FROM fields WHERE register_id = $1
