@@ -66,6 +66,12 @@ func (db *Database) GetPeripheral(pid int32) dbstore.Peripheral {
 }
 
 func (db *Database) GetRegisters(pid int32) ([]dbstore.Register, error) {
+	// if this peripheral is derived from, then we need to get the registers from that peripheral
+	p := db.GetPeripheral(pid)
+	if p.DerivedFromID.Valid {
+		pid = p.DerivedFromID.Int32
+	}
+
 	r, err := db.queries.FetchRegisters(db.ctx, pid)
 	if err != nil {
 		return r, fmt.Errorf("fetch Registers - %w", err)
