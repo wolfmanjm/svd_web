@@ -19,7 +19,7 @@ func firstLine(str string) string {
 			%meta{content: "text/html; charset=UTF-8", http-equiv: "Content-Type"}/
 			%meta{charset: "UTF-8"}/
 			%meta{content: "width=device-width, initial-scale=1.0", name: "viewport"}/
-			%title Sidebar Navigation Example
+			%title Technical guide for MCUs
 			%script{src: "https://unpkg.com/htmx.org"}
 
 			:css
@@ -211,7 +211,6 @@ func firstLine(str string) string {
 				}
 
 				.registers {
-						display: none;
 						padding: 20px;
 						background: white;
 				}
@@ -244,6 +243,7 @@ func firstLine(str string) string {
 						color: #4a5568;
 						font-size: 0.9em;
 						margin-top: 5px;
+						white-space: pre-line;
 				}
 
 				.no-results {

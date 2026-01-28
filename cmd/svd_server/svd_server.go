@@ -31,12 +31,27 @@ func Server(cstr string) error {
 		idString := r.PathValue("id")
 		id, _ := strconv.Atoi(idString)
 		periphs, err := db.GetPeripherals(int32(id))
-		if err == nil {
+		if err == nil && len(periphs) > 0 {
 			mpu := db.GetMpu(int32(id))
 			assets.ShowPeripherals(mpu.Name, periphs).Render(r.Context(), w)
+		} else {
+			http.NotFound(w, r)
+			// http.Error(w, "Peripheral not found", 404)
 		}
-		// w.Header().Set("Content-Type", "text/html")
-		// fmt.Fprintf(w, "<p>Getting peripheral for MPU %v</p>", idString)
+	})
+
+	mux.HandleFunc("/registers/{id}", func(w http.ResponseWriter, r *http.Request) {
+		idString := r.PathValue("id")
+		pid, _ := strconv.Atoi(idString)
+		regs, err := db.GetRegisters(int32(pid))
+		if err == nil && len(regs) > 0 {
+			p := db.GetPeripheral(int32(pid))
+			mpu := db.GetMpu(p.MpuID)
+			assets.ShowRegisters(mpu.Name, p.Name, regs).Render(r.Context(), w)
+		} else {
+			http.NotFound(w, r)
+			// http.Error(w, "Register not found", 404)
+		}
 	})
 
 	// mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

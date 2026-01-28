@@ -25,16 +25,16 @@ build:
 	go build -o svd_web
 
 add_svds:		## Add all the known SVDs to the database
-	go run main.go add ../svd_lookup/data/rp2350-svd.db
-	go run main.go add ../svd_lookup/data/RP2040-svd.db
 	go run main.go add ../svd_lookup/data/STM32H745_CM7-svd.db
+	go run main.go add ../svd_lookup/data/RP2040-svd.db
+	go run main.go add ../svd_lookup/data/rp2350-svd.db
 	go run main.go add ../svd_lookup/data/lpc1768-svd.db
 
 add:			## Add a SVD to the database name=xxx
 	@if [ -z "${name}" ] ; then echo "Need name"; exit 1; fi;
 	go run main.go add ../svd_lookup/data/${name}
 
-serve:			## Run the server
+serve: assets		## Run the server
 	go run main.go serve
 
 help:           	## Show this help.

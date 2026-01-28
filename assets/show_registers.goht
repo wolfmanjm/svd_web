@@ -1,0 +1,22 @@
+package assets
+import (
+	"github.com/wolfmanjm/svd_web/gen/dbstore"
+)
+
+@haml ShowRegisters(mpuname, pername string, regs []dbstore.Register) {
+	%header
+		%h1 Registers for #{pername}
+		%p.subtitle Reference Guide for #{mpuname}
+		/%button{"hx-get": #{fmt.Sprintf("/peripherals/1")}, "hx-swap": "innerHTML", "hx-target": "#contentArea.content"} Back
+	.registers
+		- for _, r := range regs
+			- name := r.Name
+			.register
+				%span.register-name #{name}
+				%span.register-offset Address Offset #{r.AddressOffset}
+				- if r.ResetValue.Valid
+					%span.register-offset Reset Value #{r.ResetValue.String}
+				- if r.Description.Valid
+					%br
+					%span.register-desc #{r.Description.String}
+}

@@ -1,17 +1,18 @@
 package assets
 import (
+	"fmt"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
 )
 
 @haml ShowPeripherals(mpuname string, periphs []dbstore.Peripheral) {
 	%header
-		%h1 Peripherals for #{mpuname}
+		%h1 Peripherals
 		%p.subtitle Reference Guide for #{mpuname}
 
 	- for _, p := range periphs
 		- name := p.Name
 		.peripheral{data-name: #{name} }
-		.peripheral-header
+		.peripheral-header{"hx-get": #{fmt.Sprintf("/registers/%d", p.ID)}, "hx-swap": "innerHTML", "hx-target": "#contentArea.content"}
 			%div
 				%span.peripheral-name #{name}
 				%span.peripheral-address #{p.BaseAddress}

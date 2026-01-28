@@ -7,6 +7,7 @@ import "context"
 import "io"
 import "github.com/stackus/goht"
 import (
+	"fmt"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
 )
 
@@ -20,7 +21,7 @@ func ShowPeripherals(mpuname string, periphs []dbstore.Peripheral) goht.Template
 		var __children goht.Template
 		ctx, __children = goht.PopChildren(ctx)
 		_ = __children
-		if _, __err = __buf.WriteString("<header>\n<h1>Peripherals for "); __err != nil {
+		if _, __err = __buf.WriteString("<header>\n<h1>Peripherals</h1>\n<p class=\"subtitle\">Reference Guide for "); __err != nil {
 			return
 		}
 		var __var1 string
@@ -28,16 +29,6 @@ func ShowPeripherals(mpuname string, periphs []dbstore.Peripheral) goht.Template
 			return
 		}
 		if _, __err = __buf.WriteString(__var1); __err != nil {
-			return
-		}
-		if _, __err = __buf.WriteString("</h1>\n<p class=\"subtitle\">Reference Guide for "); __err != nil {
-			return
-		}
-		var __var2 string
-		if __var2, __err = goht.CaptureErrors(goht.EscapeString(mpuname)); __err != nil {
-			return
-		}
-		if _, __err = __buf.WriteString(__var2); __err != nil {
 			return
 		}
 		if _, __err = __buf.WriteString("</p>\n</header>\n"); __err != nil {
@@ -51,24 +42,30 @@ func ShowPeripherals(mpuname string, periphs []dbstore.Peripheral) goht.Template
 			if _, __err = __buf.WriteString(goht.EscapeString(name) + "\""); __err != nil {
 				return
 			}
-			if _, __err = __buf.WriteString("></div>\n<div class=\"peripheral-header\">\n<div>\n<span class=\"peripheral-name\">"); __err != nil {
+			if _, __err = __buf.WriteString("></div>\n<div class=\"peripheral-header\" hx-get=\""); __err != nil {
 				return
 			}
-			var __var3 string
-			if __var3, __err = goht.CaptureErrors(goht.EscapeString(name)); __err != nil {
+			if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/registers/%d", p.ID)) + "\""); __err != nil {
 				return
 			}
-			if _, __err = __buf.WriteString(__var3); __err != nil {
+			if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\">\n<div>\n<span class=\"peripheral-name\">"); __err != nil {
+				return
+			}
+			var __var2 string
+			if __var2, __err = goht.CaptureErrors(goht.EscapeString(name)); __err != nil {
+				return
+			}
+			if _, __err = __buf.WriteString(__var2); __err != nil {
 				return
 			}
 			if _, __err = __buf.WriteString("</span>\n<span class=\"peripheral-address\">"); __err != nil {
 				return
 			}
-			var __var4 string
-			if __var4, __err = goht.CaptureErrors(goht.EscapeString(p.BaseAddress)); __err != nil {
+			var __var3 string
+			if __var3, __err = goht.CaptureErrors(goht.EscapeString(p.BaseAddress)); __err != nil {
 				return
 			}
-			if _, __err = __buf.WriteString(__var4); __err != nil {
+			if _, __err = __buf.WriteString(__var3); __err != nil {
 				return
 			}
 			if _, __err = __buf.WriteString("</span>\n"); __err != nil {
@@ -78,11 +75,11 @@ func ShowPeripherals(mpuname string, periphs []dbstore.Peripheral) goht.Template
 				if _, __err = __buf.WriteString("<br><span class=\"peripheral-description\">"); __err != nil {
 					return
 				}
-				var __var5 string
-				if __var5, __err = goht.CaptureErrors(goht.EscapeString(p.Description.String)); __err != nil {
+				var __var4 string
+				if __var4, __err = goht.CaptureErrors(goht.EscapeString(p.Description.String)); __err != nil {
 					return
 				}
-				if _, __err = __buf.WriteString(__var5); __err != nil {
+				if _, __err = __buf.WriteString(__var4); __err != nil {
 					return
 				}
 				if _, __err = __buf.WriteString("</span>\n"); __err != nil {

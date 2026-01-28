@@ -64,13 +64,29 @@ func run(url, fn string) error {
 		return fmt.Errorf("failed to fetch peripherals - %w", err)
 	}
 
+	// map localdb peripheral id to newdb id
+	var mapids map[int]int32 = make(map[int]int32, len(periphs))
+
 	for _, p := range periphs {
 		fmt.Println("  Populating Peripheral: ", p.name)
+
+		// the ID from the local database is NOT the ID in the new database
+		var d_id int32
+		var isDerivedFrom bool
+		if p.derived_from.Valid {
+			d_id, isDerivedFrom = mapids[p.derived_from.V]
+			if !isDerivedFrom {
+				return fmt.Errorf("derived from id %v is not in map", p.derived_from.V)
+			}
+		} else {
+			isDerivedFrom = false
+			d_id = 0
+		}
 
 		r_p := dbstore.AddPeripheralParams {
 			MpuID: r_mpuid,
 			Name: p.name,
-			DerivedFromID: pgtype.Int4{ Int32: int32(p.derived_from.V), Valid: p.derived_from.Valid, },
+			DerivedFromID: pgtype.Int4{ Int32: d_id, Valid: isDerivedFrom, },
 			BaseAddress: p.base_address,
 			Description: pgtype.Text { String: p.description.V, Valid: p.description.Valid },
 		}
@@ -80,16 +96,21 @@ func run(url, fn string) error {
 			return fmt.Errorf("failed to add Peripheral for mpu_id %d - %w", r_mpuid, err)
 		}
 
-		// This collects all the registers and their fields
-		pr, err := collect_registers(ldb, mpu_id, p.id)
-		if err != nil {
-			return fmt.Errorf("error in collect registers - %w", err)
-		}
+		// map old to new
+		mapids[p.id] = r_pid
 
-		// this will populate the registers and their fields
-		err = populate_registers(ctx, queries, r_pid, pr.registers)
-		if err != nil {
-			return fmt.Errorf("error in populate_registers - %w", err)
+		if !isDerivedFrom {
+			// This collects all the registers and their fields
+			pr, err := collect_registers(ldb, mpu_id, p.id)
+			if err != nil {
+				return fmt.Errorf("error in collect registers - %w", err)
+			}
+
+			// this will populate the registers and their fields
+			err = populate_registers(ctx, queries, r_pid, pr.registers)
+			if err != nil {
+				return fmt.Errorf("error in populate_registers - %w", err)
+			}
 		}
 	}
 
@@ -234,6 +255,7 @@ func CloseLocalDatabase(db *sql.DB) {
 }
 
 // collect all the registers and their fields for the named peripheral
+// NOTE if this is a derived from it will get the registers from the derived ID
 func collect_registers(db *sql.DB, mpu_id, periph_id int) (Peripheral, error) {
 	p, err := fetch_peripheral(db, mpu_id, periph_id)
 	if err != nil {

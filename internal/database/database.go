@@ -17,7 +17,6 @@ type Database struct {
 	ctx     context.Context
 }
 
-
 func Setup(cstr string) (*Database, error) {
 	ctx := context.Background()
 
@@ -59,6 +58,19 @@ func (db *Database) GetPeripherals(id int32) ([]dbstore.Peripheral, error) {
 		return p, fmt.Errorf("getPeripherals - %w", err)
 	}
 	return p, nil
+}
+
+func (db *Database) GetPeripheral(pid int32) dbstore.Peripheral {
+	p, _ := db.queries.GetPeripheral(db.ctx, pid)
+	return p
+}
+
+func (db *Database) GetRegisters(pid int32) ([]dbstore.Register, error) {
+	r, err := db.queries.FetchRegisters(db.ctx, pid)
+	if err != nil {
+		return r, fmt.Errorf("fetch Registers - %w", err)
+	}
+	return r, nil
 }
 
 func (db *Database) DoStuff() error {

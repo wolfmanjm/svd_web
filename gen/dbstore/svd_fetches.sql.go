@@ -184,6 +184,26 @@ func (q *Queries) GetMCU(ctx context.Context, id int32) (Mpu, error) {
 	return i, err
 }
 
+const getPeripheral = `-- name: GetPeripheral :one
+SELECT id, mpu_id, derived_from_id, name, base_address, description
+FROM peripherals
+WHERE id = $1
+`
+
+func (q *Queries) GetPeripheral(ctx context.Context, id int32) (Peripheral, error) {
+	row := q.db.QueryRow(ctx, getPeripheral, id)
+	var i Peripheral
+	err := row.Scan(
+		&i.ID,
+		&i.MpuID,
+		&i.DerivedFromID,
+		&i.Name,
+		&i.BaseAddress,
+		&i.Description,
+	)
+	return i, err
+}
+
 const listMPUs = `-- name: ListMPUs :many
 SELECT id, name, description
 FROM mpus

@@ -23,6 +23,11 @@ SELECT *
 FROM peripherals
 WHERE mpu_id = $1 AND lower(name) LIKE lower(@name::text);
 
+-- name: GetPeripheral :one
+SELECT *
+FROM peripherals
+WHERE id = $1;
+
 -- name: FetchRegisters :many
 SELECT *
 FROM registers WHERE peripheral_id = $1
