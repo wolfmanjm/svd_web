@@ -1,7 +1,18 @@
 package assets
-import	"github.com/wolfmanjm/svd_web/gen/dbstore"
+import(
+	"fmt"
+	"strings"
+	"github.com/wolfmanjm/svd_web/gen/dbstore"
+	"github.com/wolfmanjm/svd_web/internal/database"
+)
 
-@haml SidebarLayout(mcus []dbstore.Mpu) {
+func firstLine(str string) string {
+	s := strings.TrimLeft(str, " \n")
+	before, _, _ := strings.Cut(s, "\n")
+	return before
+}
+
+@haml SidebarLayout(db *database.Database, mcus []dbstore.Mpu) {
 	!!!
 	%html{lang: "en"}
 		%head
@@ -9,6 +20,8 @@ import	"github.com/wolfmanjm/svd_web/gen/dbstore"
 			%meta{charset: "UTF-8"}/
 			%meta{content: "width=device-width, initial-scale=1.0", name: "viewport"}/
 			%title Sidebar Navigation Example
+			%script{src: "https://unpkg.com/htmx.org"}
+
 			:css
 				* {
 						margin: 0;
@@ -18,6 +31,8 @@ import	"github.com/wolfmanjm/svd_web/gen/dbstore"
 
 				body {
 						font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+						background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+						padding: 20px;
 						height: 100vh;
 						overflow: hidden;
 				}
@@ -25,6 +40,12 @@ import	"github.com/wolfmanjm/svd_web/gen/dbstore"
 				.container {
 						display: flex;
 						height: 100vh;
+						max-width: 1200px;
+						margin: 0 auto;
+						background: white;
+						border-radius: 12px;
+						box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+						overflow: hidden;
 				}
 
 				/* Left Column - Sidebar */
@@ -84,45 +105,6 @@ import	"github.com/wolfmanjm/svd_web/gen/dbstore"
 						padding: 40px;
 				}
 
-				.content-header {
-						margin-bottom: 20px;
-				}
-
-				.content-header h1 {
-						font-size: 32px;
-						color: #2c3e50;
-						margin-bottom: 10px;
-				}
-
-				.content-header .meta {
-						color: #7f8c8d;
-						font-size: 14px;
-				}
-
-				.content-body {
-						background-color: white;
-						padding: 30px;
-						border-radius: 8px;
-						box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-						line-height: 1.6;
-						color: #34495e;
-				}
-
-				.content-body h2 {
-						color: #2c3e50;
-						margin-top: 20px;
-						margin-bottom: 10px;
-				}
-
-				.content-body ul {
-						margin-left: 20px;
-						margin-top: 10px;
-				}
-
-				.content-body li {
-						margin-bottom: 8px;
-				}
-
 				/* Empty state */
 				.empty-state {
 						text-align: center;
@@ -134,6 +116,217 @@ import	"github.com/wolfmanjm/svd_web/gen/dbstore"
 						font-size: 24px;
 						margin-bottom: 10px;
 				}
+
+				header {
+						background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+						color: white;
+						padding: 30px;
+						text-align: center;
+				}
+
+				h1 {
+						font-size: 2em;
+						margin-bottom: 10px;
+				}
+
+				.subtitle {
+						opacity: 0.8;
+						font-size: 0.9em;
+				}
+
+				.search-bar {
+						padding: 20px 30px;
+						background: #f7fafc;
+						border-bottom: 1px solid #e2e8f0;
+				}
+
+				input[type="search"] {
+						width: 100%;
+						padding: 12px 20px;
+						border: 2px solid #cbd5e0;
+						border-radius: 8px;
+						font-size: 1em;
+						transition: border-color 0.3s;
+				}
+
+				input[type="search"]:focus {
+						outline: none;
+						border-color: #667eea;
+				}
+
+				.peripheral {
+						margin-bottom: 20px;
+						border: 1px solid #e2e8f0;
+						border-radius: 8px;
+						overflow: hidden;
+						transition: box-shadow 0.3s;
+				}
+
+				.peripheral:hover {
+						box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				}
+
+				.peripheral-header {
+						background: #edf2f7;
+						padding: 15px 20px;
+						cursor: pointer;
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+						user-select: none;
+				}
+
+				.peripheral-header:hover {
+						background: #e2e8f0;
+				}
+
+				.peripheral-name {
+						font-weight: 600;
+						font-size: 1.1em;
+						color: #2d3748;
+				}
+
+				.peripheral-address {
+						color: #718096;
+						font-family: 'Courier New', monospace;
+						font-weight: bold;
+						font-size: 1.0em;
+				}
+
+				.peripheral-description {
+						color: #718096;
+						font-family: 'Courier New';
+						font-size: 0.9em;
+						white-space: pre-line;
+				}
+
+				.toggle-icon {
+						color: #667eea;
+						font-weight: bold;
+						transition: transform 0.3s;
+				}
+
+				.peripheral.active .toggle-icon {
+						transform: rotate(180deg);
+				}
+
+				.registers {
+						display: none;
+						padding: 20px;
+						background: white;
+				}
+
+				.peripheral.active .registers {
+						display: block;
+				}
+
+				.register {
+						padding: 12px;
+						border-left: 3px solid #667eea;
+						background: #f7fafc;
+						margin-bottom: 10px;
+						border-radius: 4px;
+				}
+
+				.register-name {
+						font-weight: 600;
+						color: #2d3748;
+						font-family: 'Courier New', monospace;
+				}
+
+				.register-offset {
+						color: #718096;
+						font-size: 0.85em;
+						margin-left: 10px;
+				}
+
+				.register-desc {
+						color: #4a5568;
+						font-size: 0.9em;
+						margin-top: 5px;
+				}
+
+				.no-results {
+						text-align: center;
+						padding: 40px;
+						color: #718096;
+				}
+
+				.register-fields {
+						margin-top: 15px;
+						padding: 15px;
+						background: white;
+						border: 1px solid #e2e8f0;
+						border-radius: 6px;
+				}
+
+				.fields-header {
+						font-size: 0.85em;
+						font-weight: 600;
+						color: #4a5568;
+						margin-bottom: 10px;
+						text-transform: uppercase;
+						letter-spacing: 0.5px;
+				}
+
+				.field {
+					display: grid;
+					grid-template-columns: 80px 120px 1fr;
+					gap: 15px;
+					padding: 10px;
+					border-bottom: 1px solid #f7fafc;
+					align-items: start;
+				}
+
+				.field:last-child {
+					border-bottom: none;
+				}
+
+				.field:hover {
+					background: #f7fafc;
+				}
+
+				.field-bits {
+					font-family: 'Courier New', monospace;
+					font-weight: 600;
+					color: #667eea;
+					font-size: 0.9em;
+				}
+
+				.field-name {
+					font-family: 'Courier New', monospace;
+					font-weight: 600;
+					color: #2d3748;
+					font-size: 0.9em;
+				}
+
+				.field-desc {
+					color: #4a5568;
+					font-size: 0.85em;
+					line-height: 1.5;
+				}
+
+				.field-access {
+					display: inline-block;
+					padding: 2px 8px;
+					background: #e6fffa;
+					color: #047857;
+					border-radius: 4px;
+					font-size: 0.75em;
+					font-weight: 600;
+					margin-left: 8px;
+				}
+
+				.field-access.ro {
+					background: #fef3c7;
+					color: #92400e;
+				}
+
+				.field-access.wo {
+					background: #dbeafe;
+					color: #1e40af;
+				}
+
 		%body
 			.container
 				/ Left Sidebar
@@ -142,166 +335,33 @@ import	"github.com/wolfmanjm/svd_web/gen/dbstore"
 						%h2 MCU list
 					%ul#menuList.menu-list
 						- for _, m := range mcus
-							%li.menu-item{data-id: #{%d m.ID} }
+							%li.menu-item{"hx-get": #{fmt.Sprintf("/peripherals/%d", m.ID)}, "hx-swap": "innerHTML", "hx-target": "#contentArea.content"}
 								%h3= m.Name
 								- if m.Description.Valid
-									%p= m.Description.String
+									%p= firstLine(m.Description.String)
 
 				/ Right Content Area
 				%main#contentArea.content
+					%header
+						%h1 SVD Peripherals &amp; Registers
+						%p.subtitle Reference Guide for Various Microcontrollers
 					.empty-state
 						%h2 Welcome!
-						%p Select a MCU from the menu to see the Peripherals
+						%p Select a MCU from the sidebar to see the Peripherals
 
 
-			:javascript
-				// Content data for each menu item
-				const contentData = {
-						1: {
-								title: "Introduction",
-								meta: "Getting Started Guide",
-								body: `
-										<h2>Welcome to the Introduction</h2>
-										<p>This section will help you understand the fundamental concepts and get started quickly.</p>
+		:javascript
+			// Get references to DOM elements
+			const menuItems = document.querySelectorAll('.menu-item');
 
-										<h2>What You'll Learn</h2>
-										<ul>
-												<li>Basic concepts and terminology</li>
-												<li>How to set up your environment</li>
-												<li>Your first steps with the platform</li>
-												<li>Common patterns and best practices</li>
-										</ul>
+			// Add click event listeners to menu items
+			menuItems.forEach(item => {
+				item.addEventListener('click', function() {
+					// Remove active class from all items
+					menuItems.forEach(i => i.classList.remove('active'));
 
-										<h2>Prerequisites</h2>
-										<p>Before you begin, make sure you have a basic understanding of HTML, CSS, and JavaScript.</p>
-								`
-						},
-						2: {
-								title: "Features",
-								meta: "Core Functionality",
-								body: `
-										<h2>Key Features</h2>
-										<p>Discover the powerful features that make this platform stand out.</p>
-
-										<h2>Main Features</h2>
-										<ul>
-												<li><strong>Responsive Design:</strong> Works seamlessly on all devices</li>
-												<li><strong>Easy Integration:</strong> Simple API for quick setup</li>
-												<li><strong>Customizable:</strong> Fully customizable to match your brand</li>
-												<li><strong>Performance:</strong> Optimized for speed and efficiency</li>
-												<li><strong>Security:</strong> Built with security best practices</li>
-										</ul>
-
-										<h2>Advanced Capabilities</h2>
-										<p>Take advantage of advanced features like real-time updates, data synchronization, and extensible plugins.</p>
-								`
-						},
-						3: {
-								title: "Documentation",
-								meta: "Technical Reference",
-								body: `
-										<h2>Technical Documentation</h2>
-										<p>Comprehensive technical reference for developers.</p>
-
-										<h2>API Reference</h2>
-										<p>The API provides a complete set of methods and properties for interacting with the system.</p>
-
-										<h2>Available Methods</h2>
-										<ul>
-												<li><code>initialize()</code> - Initialize the application</li>
-												<li><code>getData()</code> - Retrieve data from the server</li>
-												<li><code>setData()</code> - Update data on the server</li>
-												<li><code>destroy()</code> - Clean up and remove all listeners</li>
-										</ul>
-
-										<h2>Configuration Options</h2>
-										<p>Customize the behavior using configuration objects passed during initialization.</p>
-								`
-						},
-						4: {
-								title: "Examples",
-								meta: "Code Samples & Demos",
-								body: `
-										<h2>Code Examples</h2>
-										<p>Learn by example with these practical code samples.</p>
-
-										<h2>Basic Example</h2>
-										<p>Here's a simple example to get you started:</p>
-										<pre style="background: #f4f4f4; padding: 15px; border-radius: 4px; overflow-x: auto;">
-				const app = new Application({
-						container: '#app',
-						theme: 'light',
-						autoLoad: true
+					// Add active class to clicked item
+					this.classList.add('active');
 				});
-
-				app.initialize();
-														</pre>
-
-														<h2>More Examples</h2>
-														<ul>
-																<li>Form validation example</li>
-																<li>Data table with sorting and filtering</li>
-																<li>Real-time chat application</li>
-																<li>Interactive dashboard</li>
-														</ul>
-												`
-										},
-										5: {
-												title: "Support",
-												meta: "Help & Resources",
-												body: `
-														<h2>Get Support</h2>
-														<p>We're here to help you succeed.</p>
-
-														<h2>Support Channels</h2>
-														<ul>
-																<li><strong>Community Forum:</strong> Ask questions and share knowledge</li>
-																<li><strong>Email Support:</strong> support@example.com</li>
-																<li><strong>Live Chat:</strong> Available Monday-Friday, 9am-5pm EST</li>
-																<li><strong>GitHub Issues:</strong> Report bugs and request features</li>
-														</ul>
-
-														<h2>Additional Resources</h2>
-														<p>Check out our blog for tutorials, video guides on YouTube, and join our community on Discord.</p>
-												`
-										}
-								};
-
-								// Get references to DOM elements
-								const menuItems = document.querySelectorAll('.menu-item');
-								const contentArea = document.getElementById('contentArea');
-
-								// Add click event listeners to menu items
-								menuItems.forEach(item => {
-										item.addEventListener('click', function() {
-												// Remove active class from all items
-												menuItems.forEach(i => i.classList.remove('active'));
-
-												// Add active class to clicked item
-												this.classList.add('active');
-
-												// Get the data-id of clicked item
-												const itemId = this.getAttribute('data-id');
-
-												// Update content area
-												displayContent(itemId);
-										});
-								});
-
-								// Function to display content
-								function displayContent(id) {
-										const data = contentData[id];
-
-										if (data) {
-												contentArea.innerHTML = `
-														<div class="content-header">
-																<h1>${data.title}</h1>
-																<div class="meta">${data.meta}</div>
-														</div>
-														<div class="content-body">
-																${data.body}
-														</div>
-												`;
-										}
-								}
+			});
 }

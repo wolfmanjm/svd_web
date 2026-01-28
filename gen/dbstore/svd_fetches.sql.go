@@ -171,6 +171,19 @@ func (q *Queries) FindRegister(ctx context.Context, arg FindRegisterParams) (Reg
 	return i, err
 }
 
+const getMCU = `-- name: GetMCU :one
+SELECT id, name, description
+FROM mpus
+WHERE id = $1
+`
+
+func (q *Queries) GetMCU(ctx context.Context, id int32) (Mpu, error) {
+	row := q.db.QueryRow(ctx, getMCU, id)
+	var i Mpu
+	err := row.Scan(&i.ID, &i.Name, &i.Description)
+	return i, err
+}
+
 const listMPUs = `-- name: ListMPUs :many
 SELECT id, name, description
 FROM mpus

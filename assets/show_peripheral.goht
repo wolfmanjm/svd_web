@@ -1,0 +1,21 @@
+package assets
+import (
+	"github.com/wolfmanjm/svd_web/gen/dbstore"
+)
+
+@haml ShowPeripherals(mpuname string, periphs []dbstore.Peripheral) {
+	%header
+		%h1 Peripherals for #{mpuname}
+		%p.subtitle Reference Guide for #{mpuname}
+
+	- for _, p := range periphs
+		- name := p.Name
+		.peripheral{data-name: #{name} }
+		.peripheral-header
+			%div
+				%span.peripheral-name #{name}
+				%span.peripheral-address #{p.BaseAddress}
+				- if p.Description.Valid
+					%br
+					%span.peripheral-description #{p.Description.String}
+}

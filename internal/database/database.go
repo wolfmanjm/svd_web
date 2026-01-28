@@ -17,6 +17,7 @@ type Database struct {
 	ctx     context.Context
 }
 
+
 func Setup(cstr string) (*Database, error) {
 	ctx := context.Background()
 
@@ -37,16 +38,30 @@ func (db *Database) Close() {
 	db.conn.Close(db.ctx)
 }
 
+// yet another layer of abstraction
 func (db *Database) GetMpus() ([]dbstore.Mpu, error) {
 	// get all mpus
 	mpus, err := db.queries.ListMPUs(db.ctx)
 	if err != nil {
-		return mpus, fmt.Errorf("getmpus - %w", err)
+		return mpus, fmt.Errorf("getMpus - %w", err)
 	}
 	return mpus, nil
 }
 
-func (db *Database) dostuff() error {
+func (db *Database) GetMpu(id int32) dbstore.Mpu {
+	m, _ := db.queries.GetMCU(db.ctx, id)
+	return m
+}
+
+func (db *Database) GetPeripherals(id int32) ([]dbstore.Peripheral, error) {
+	p, err := db.queries.FetchPeripherals(db.ctx, id)
+	if err != nil {
+		return p, fmt.Errorf("getPeripherals - %w", err)
+	}
+	return p, nil
+}
+
+func (db *Database) DoStuff() error {
 	// list all mpus
 	mpus, err := db.queries.ListMPUs(db.ctx)
 	if err != nil {

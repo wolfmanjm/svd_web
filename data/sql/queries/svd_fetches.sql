@@ -8,6 +8,11 @@ SELECT *
 FROM mpus
 WHERE lower(name) LIKE lower(@name::text);
 
+-- name: GetMCU :one
+SELECT *
+FROM mpus
+WHERE id = $1;
+
 -- name: FetchPeripherals :many
 SELECT *
 FROM peripherals WHERE mpu_id = $1
