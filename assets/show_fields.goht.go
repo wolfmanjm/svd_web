@@ -7,10 +7,18 @@ import "context"
 import "io"
 import "github.com/stackus/goht"
 import (
+	"cmp"
 	"fmt"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
 	"github.com/wolfmanjm/svd_web/internal/database"
+	"slices"
 )
+
+type BitField struct {
+	Colspan  int32
+	Value    string
+	Reserved bool
+}
 
 func displayBits(numbits, offset int32) string {
 	bs := offset
@@ -19,6 +27,273 @@ func displayBits(numbits, offset int32) string {
 		return fmt.Sprintf("[%v]", bs)
 	}
 	return fmt.Sprintf("[%v:%v]", be, bs)
+}
+
+func generateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
+	// convert into a map
+	fmap := make(map[int32]dbstore.Field, len(fields))
+	for _, f := range fields {
+		fmap[f.BitOffset] = f
+	}
+
+	// find the maximum bit offset
+	maxBit := slices.MaxFunc(fields, func(a, b dbstore.Field) int {
+		return cmp.Compare(a.BitOffset, b.BitOffset)
+	})
+
+	maxBits := maxBit.BitOffset + maxBit.NumBits - 1
+	colspan := 31 - maxBits
+
+	var colspans [32]int32
+	// Unused bits at MSB of word
+	if colspan > 1 {
+		colspans[maxBits+1] = colspan
+	}
+
+	// find the colspan for each other bit
+	for i := int32(0); i <= maxBits; i++ {
+		f, ok := fmap[i]
+		if ok {
+			colspans[i] = f.NumBits
+		} else {
+			colspans[i] = 1
+		}
+	}
+
+	// Bit numbers
+	var bitNumbers []BitField
+
+	for i := int32(0); i < 32; {
+		var b BitField
+		b.Colspan = colspans[i]
+		if colspans[i] > 1 {
+			b.Value = fmt.Sprintf("%d-%d", i, i+colspans[i]-1)
+			i += colspans[i]
+		} else {
+			b.Value = fmt.Sprintf("%d", i)
+			i++
+		}
+		bitNumbers = append(bitNumbers, b)
+	}
+
+	// Field names
+	var bitNames []BitField
+	for i := int32(0); i < 32; {
+		var b BitField
+		f, ok := fmap[i]
+		b.Colspan = colspans[i]
+		b.Reserved = !ok
+		if colspans[i] > 1 {
+			if !ok {
+				b.Value = "Reserved"
+			} else {
+				b.Value = f.Name
+			}
+			i += colspans[i]
+
+		} else {
+			if !ok {
+				b.Value = "-"
+			} else {
+				b.Value = f.Name
+			}
+			i++
+		}
+		bitNames = append(bitNames, b)
+	}
+
+	return bitNumbers, bitNames
+}
+
+func BitNumbersFrag(bs []BitField) goht.Template {
+	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
+		__buf, __isBuf := __w.(goht.Buffer)
+		if !__isBuf {
+			__buf = goht.GetBuffer()
+			defer goht.ReleaseBuffer(__buf)
+		}
+		var __children goht.Template
+		ctx, __children = goht.PopChildren(ctx)
+		_ = __children
+		if _, __err = __buf.WriteString("<!--Bit numbers-->\n<tr class=\"bit-numbers\">\n"); __err != nil {
+			return
+		}
+		for _, b := range bs {
+			if b.Colspan > 1 {
+				if _, __err = __buf.WriteString("<td colspan=\""); __err != nil {
+					return
+				}
+				if _, __err = __buf.WriteString(goht.EscapeString(goht.FormatString("%d", b.Colspan)) + "\""); __err != nil {
+					return
+				}
+				if _, __err = __buf.WriteString(">"); __err != nil {
+					return
+				}
+				var __var1 string
+				if __var1, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+					return
+				}
+				if _, __err = __buf.WriteString(__var1); __err != nil {
+					return
+				}
+				if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+					return
+				}
+			} else {
+				if _, __err = __buf.WriteString("<td>"); __err != nil {
+					return
+				}
+				var __var2 string
+				if __var2, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+					return
+				}
+				if _, __err = __buf.WriteString(__var2); __err != nil {
+					return
+				}
+				if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+					return
+				}
+			}
+		}
+		if _, __err = __buf.WriteString("</tr>\n"); __err != nil {
+			return
+		}
+		if !__isBuf {
+			_, __err = __w.Write(__buf.Bytes())
+		}
+		return
+	})
+}
+
+func FieldNamesFrag(bs []BitField) goht.Template {
+	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
+		__buf, __isBuf := __w.(goht.Buffer)
+		if !__isBuf {
+			__buf = goht.GetBuffer()
+			defer goht.ReleaseBuffer(__buf)
+		}
+		var __children goht.Template
+		ctx, __children = goht.PopChildren(ctx)
+		_ = __children
+		if _, __err = __buf.WriteString("<!--Field Names-->\n<tr class=\"bit-fields\">\n"); __err != nil {
+			return
+		}
+		for _, b := range bs {
+			if b.Colspan > 1 {
+				if b.Reserved {
+					if _, __err = __buf.WriteString("<td class=\"reserved\" colspan=\""); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(goht.EscapeString(goht.FormatString("%d", b.Colspan)) + "\""); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(">"); __err != nil {
+						return
+					}
+					var __var1 string
+					if __var1, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(__var1); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+						return
+					}
+				} else {
+					if _, __err = __buf.WriteString("<td class=\"rw\" colspan=\""); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(goht.EscapeString(goht.FormatString("%d", b.Colspan)) + "\""); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(">"); __err != nil {
+						return
+					}
+					var __var2 string
+					if __var2, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(__var2); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+						return
+					}
+				}
+			} else {
+				if b.Reserved {
+					if _, __err = __buf.WriteString("<td class=\"reserved\">"); __err != nil {
+						return
+					}
+					var __var3 string
+					if __var3, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(__var3); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+						return
+					}
+				} else {
+					if _, __err = __buf.WriteString("<td class=\"rw\">"); __err != nil {
+						return
+					}
+					var __var4 string
+					if __var4, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(__var4); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+						return
+					}
+				}
+			}
+		}
+		if _, __err = __buf.WriteString("</tr>\n"); __err != nil {
+			return
+		}
+		if !__isBuf {
+			_, __err = __w.Write(__buf.Bytes())
+		}
+		return
+	})
+}
+
+func generateTable(fields []dbstore.Field) goht.Template {
+	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
+		__buf, __isBuf := __w.(goht.Buffer)
+		if !__isBuf {
+			__buf = goht.GetBuffer()
+			defer goht.ReleaseBuffer(__buf)
+		}
+		var __children goht.Template
+		ctx, __children = goht.PopChildren(ctx)
+		_ = __children
+		bnums, bnames := generateFieldDiagram(fields)
+		if _, __err = __buf.WriteString("<!--Bit numbers-->\n<tr class=\"bit-numbers\">\n"); __err != nil {
+			return
+		}
+		if __err = BitNumbersFrag(bnums).Render(ctx, __buf); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString("</tr>\n<!--Field names-->\n<tr class=\"bit-fields\">\n"); __err != nil {
+			return
+		}
+		if __err = FieldNamesFrag(bnames).Render(ctx, __buf); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString("</tr>\n"); __err != nil {
+			return
+		}
+		if !__isBuf {
+			_, __err = __w.Write(__buf.Bytes())
+		}
+		return
+	})
 }
 
 func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
@@ -34,7 +309,7 @@ func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
 		r := db.GetRegister(fields[0].RegisterID)
 		p := db.GetPeripheral(r.PeripheralID)
 		m := db.GetMpu(p.MpuID)
-		if _, __err = __buf.WriteString("<header>\n<h1>Fields for "); __err != nil {
+		if _, __err = __buf.WriteString("<header>\n<h1>Bit Fields for "); __err != nil {
 			return
 		}
 		var __var1 string
@@ -64,7 +339,13 @@ func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
 		if _, __err = __buf.WriteString(__var3); __err != nil {
 			return
 		}
-		if _, __err = __buf.WriteString("</p>\n</header>\n<div class=\"register-fields\">\n"); __err != nil {
+		if _, __err = __buf.WriteString("</p>\n</header>\n<div class=\"register-diagram\">\n<table class=\"bit-field-table\">\n"); __err != nil {
+			return
+		}
+		if __err = generateTable(fields).Render(ctx, __buf); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString("</table>\n</div>\n<div class=\"register-fields\">\n"); __err != nil {
 			return
 		}
 		for _, f := range fields {

@@ -275,7 +275,7 @@ func firstLine(str string) string {
 
 				.field {
 					display: grid;
-					grid-template-columns: 80px 120px 1fr;
+					grid-template-columns: 80px 120px;
 					gap: 15px;
 					padding: 10px;
 					border-bottom: 1px solid #f7fafc;
@@ -299,8 +299,74 @@ func firstLine(str string) string {
 				.field-desc {
 					color: #4a5568;
 					font-size: 0.85em;
+					margin-left: 80px;
 					white-space: pre-line;
 				}
+
+				.register-diagram {
+						margin: 15px 0;
+						overflow-x: auto;
+				}
+
+				/* Field diagram */
+				.bit-field-table {
+						width: 100%;
+						border-collapse: collapse;
+						font-family: 'Courier New', monospace;
+						font-size: 0.85em;
+						min-width: 600px;
+				}
+
+				.bit-numbers {
+						background: #2d3748;
+						color: white;
+						text-align: center;
+						font-weight: 600;
+				}
+
+				.bit-numbers td {
+						padding: 6px 4px;
+						border: 1px solid #1a202c;
+						font-size: 0.75em;
+				}
+
+				.bit-fields td {
+						padding: 20px 8px;
+						border: 2px solid #2d3748;
+						text-align: center;
+						background: #edf2f7;
+						font-weight: 600;
+						position: relative;
+				}
+
+				.bit-fields td.reserved {
+						background: #f7fafc;
+						color: #a0aec0;
+						font-style: italic;
+				}
+
+				.bit-fields td.rw {
+						background: #e6fffa;
+				}
+
+				.bit-fields td.ro {
+						background: #fef3c7;
+				}
+
+				.bit-fields td.wo {
+						background: #dbeafe;
+				}
+
+				.reset-values td {
+						padding: 6px 4px;
+						border: 1px solid #cbd5e0;
+						text-align: center;
+						background: #f7fafc;
+						color: #718096;
+						font-size: 0.75em;
+				}
+
+
 
 		%body
 			.container
