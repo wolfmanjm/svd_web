@@ -68,6 +68,19 @@ func (db *Database) GetPeripheral(pid int32) dbstore.Peripheral {
 	return p
 }
 
+// return peripherals that match the pattern
+func (db *Database) FindPeripherals(id int32, pat string) ([]dbstore.Peripheral, error) {
+	args := dbstore.FindPeripheralsParams {
+		MpuID: id,
+		Name: "%" + pat + "%",
+	}
+	p, err := db.queries.FindPeripherals(db.ctx, args)
+	if err != nil {
+		return p, fmt.Errorf("findPeripherals - %w", err)
+	}
+	return p, nil
+}
+
 // Get registers for the specified peripheral, will follow the DerivedFrom field if needed
 func (db *Database) GetRegisters(pid int32) ([]dbstore.Register, error) {
 	// if this peripheral is derived from, then we need to get the registers from that peripheral

@@ -12,7 +12,7 @@ import (
 	"github.com/wolfmanjm/svd_web/internal/database"
 )
 
-func ShowPeripherals(mpuname string, db *database.Database, periphs []dbstore.Peripheral) goht.Template {
+func ShowPeripherals(db *database.Database, periphs []dbstore.Peripheral) goht.Template {
 	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
 		__buf, __isBuf := __w.(goht.Buffer)
 		if !__isBuf {
@@ -22,17 +22,28 @@ func ShowPeripherals(mpuname string, db *database.Database, periphs []dbstore.Pe
 		var __children goht.Template
 		ctx, __children = goht.PopChildren(ctx)
 		_ = __children
-		if _, __err = __buf.WriteString("<header>\n<h1>Peripherals</h1>\n<p class=\"subtitle\">Reference Guide for "); __err != nil {
+		if _, __err = __buf.WriteString("<header>\n"); __err != nil {
+			return
+		}
+		p := periphs[0]
+		m := db.GetMpu(p.MpuID)
+		if _, __err = __buf.WriteString("<h1>Peripherals</h1>\n<p class=\"subtitle\">Reference Guide for "); __err != nil {
 			return
 		}
 		var __var1 string
-		if __var1, __err = goht.CaptureErrors(goht.EscapeString(mpuname)); __err != nil {
+		if __var1, __err = goht.CaptureErrors(goht.EscapeString(m.Name)); __err != nil {
 			return
 		}
 		if _, __err = __buf.WriteString(__var1); __err != nil {
 			return
 		}
-		if _, __err = __buf.WriteString("</p>\n</header>\n"); __err != nil {
+		if _, __err = __buf.WriteString("</p>\n</header>\n<div class=\"search-bar\">\n<input id=\"searchInput\" name=\"pattern\" placeholder=\"Filter peripherals...\" type=\"search\" hx-get=\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/findperipherals/%d", p.MpuID)) + "\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\" hx-include=\"[name=&#39;pattern&#39;]\"></div>\n"); __err != nil {
 			return
 		}
 		for _, p := range periphs {

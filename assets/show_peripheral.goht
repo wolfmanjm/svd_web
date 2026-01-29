@@ -5,10 +5,22 @@ import (
 	"github.com/wolfmanjm/svd_web/internal/database"
 )
 
-@haml ShowPeripherals(mpuname string, db *database.Database, periphs []dbstore.Peripheral) {
+@haml ShowPeripherals(db *database.Database, periphs []dbstore.Peripheral) {
 	%header
+		- p := periphs[0]
+		- m := db.GetMpu(p.MpuID)
 		%h1 Peripherals
-		%p.subtitle Reference Guide for #{mpuname}
+		%p.subtitle Reference Guide for #{m.Name}
+	.search-bar
+		%input#searchInput{
+		name: "pattern",
+		placeholder: "Filter peripherals...",
+		type: "search",
+		"hx-get": #{fmt.Sprintf("/findperipherals/%d", p.MpuID)},
+		"hx-swap": "innerHTML",
+		"hx-target": "#contentArea.content",
+		"hx-include": "[name='pattern']"
+		}
 
 	- for _, p := range periphs
 		- name := p.Name

@@ -82,6 +82,8 @@ func GenerateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
 		}
 		bitNames = append(bitNames, b)
 	}
+
+	// reverse them so MSB is to the left
 	slices.Reverse(bitNumbers)
 	slices.Reverse(bitNames)
 	return bitNumbers, bitNames

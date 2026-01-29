@@ -7,6 +7,7 @@ import (
 
 	"github.com/wolfmanjm/svd_web/assets"
 	"github.com/wolfmanjm/svd_web/internal/database"
+	"github.com/stackus/hxgo"
 )
 
 func Server(cstr string) error {
@@ -23,25 +24,60 @@ func Server(cstr string) error {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		//_ = assets.SiteLayout().Render(r.Context(), w)
-		assets.SidebarLayout(db, mpus).Render(r.Context(), w)
-	})
-
-	mux.HandleFunc("/peripherals/{id}", func(w http.ResponseWriter, r *http.Request) {
-		idString := r.PathValue("id")
-		id, _ := strconv.Atoi(idString)
-		periphs, err := db.GetPeripherals(int32(id))
-		if err == nil && len(periphs) > 0 {
-			mpu := db.GetMpu(int32(id))
-			// We have to pass in the db so it can lookup the name of a derived from peripheral
-			assets.ShowPeripherals(mpu.Name, db, periphs).Render(r.Context(), w)
+		if hx.IsHtmx(r) {
+			hx.Response(w, hx.Redirect("/"))
+		} else if r.RequestURI == "/" {
+			//_ = assets.SiteLayout().Render(r.Context(), w)
+			assets.SidebarLayout(db, mpus).Render(r.Context(), w)
 		} else {
 			http.NotFound(w, r)
-			// http.Error(w, "Peripheral not found", 404)
 		}
 	})
 
+	mux.HandleFunc("/peripherals/{id}", func(w http.ResponseWriter, r *http.Request) {
+		if !hx.IsHtmx(r) {
+			http.NotFound(w, r)
+			return
+		}
+
+		idString := r.PathValue("id")
+		id, _ := strconv.Atoi(idString)
+		periphs, err := db.GetPeripherals(int32(id))
+		if err != nil {
+			hx.Response(w, hx.Retarget("/"))
+		} else if len(periphs) > 0 {
+			// We have to pass in the db so it can lookup the name of a derived from peripheral
+			assets.ShowPeripherals(db, periphs).Render(r.Context(), w)
+		} else {
+			http.Error(w, "Peripheral not found", 200)
+		}
+	})
+
+	mux.HandleFunc("/findperipherals/{id}", func(w http.ResponseWriter, r *http.Request) {
+		if !hx.IsHtmx(r) {
+			http.NotFound(w, r)
+			return
+		}
+		pat := r.URL.Query().Get("pattern")
+		idString := r.PathValue("id")
+		id, _ := strconv.Atoi(idString)
+		periphs, err := db.FindPeripherals(int32(id), pat)
+		if err != nil {
+			hx.Response(w, hx.Retarget("/"))
+		} else if len(periphs) > 0 {
+			// We have to pass in the db so it can lookup the name of a derived from peripheral
+			assets.ShowPeripherals(db, periphs).Render(r.Context(), w)
+		} else {
+			http.Error(w, "No Peripherals match", 200)
+		}
+	})
+
+
 	mux.HandleFunc("/registers/{id}", func(w http.ResponseWriter, r *http.Request) {
+		if !hx.IsHtmx(r) {
+			http.NotFound(w, r)
+			return
+		}
 		idString := r.PathValue("id")
 		pid, _ := strconv.Atoi(idString)
 		// Note this will get registers from a Derived From peripheral if needed
@@ -57,6 +93,10 @@ func Server(cstr string) error {
 	})
 
 	mux.HandleFunc("/fields/{id}", func(w http.ResponseWriter, r *http.Request) {
+		if !hx.IsHtmx(r) {
+			http.NotFound(w, r)
+			return
+		}
 		idString := r.PathValue("id")
 		id, _ := strconv.Atoi(idString)
 		f, err := db.GetFields(int32(id))
