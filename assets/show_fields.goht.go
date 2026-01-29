@@ -7,18 +7,11 @@ import "context"
 import "io"
 import "github.com/stackus/goht"
 import (
-	"cmp"
 	"fmt"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
 	"github.com/wolfmanjm/svd_web/internal/database"
-	"slices"
+	"github.com/wolfmanjm/svd_web/internal/helpers"
 )
-
-type bitField struct {
-	Colspan  int32
-	Value    string
-	Reserved bool
-}
 
 func displayBits(numbits, offset int32) string {
 	bs := offset
@@ -29,81 +22,7 @@ func displayBits(numbits, offset int32) string {
 	return fmt.Sprintf("[%v:%v]", be, bs)
 }
 
-func generateFieldDiagram(fields []dbstore.Field) ([]bitField, []bitField) {
-	// convert into a map
-	fmap := make(map[int32]dbstore.Field, len(fields))
-	for _, f := range fields {
-		fmap[f.BitOffset] = f
-	}
-
-	// find the maximum bit offset
-	maxBit := slices.MaxFunc(fields, func(a, b dbstore.Field) int {
-		return cmp.Compare(a.BitOffset, b.BitOffset)
-	})
-
-	maxBits := maxBit.BitOffset + maxBit.NumBits - 1
-	colspan := 31 - maxBits
-
-	var colspans [32]int32
-	// Unused bits at MSB of word
-	if colspan > 1 {
-		colspans[maxBits+1] = colspan
-	}
-
-	// find the colspan for each other bit
-	for i := int32(0); i <= maxBits; i++ {
-		f, ok := fmap[i]
-		if ok {
-			colspans[i] = f.NumBits
-		} else {
-			colspans[i] = 1
-		}
-	}
-
-	// Generate Bit numbers
-	var bitNumbers []bitField
-
-	for i := int32(0); i < 32; {
-		var b bitField
-		b.Colspan = colspans[i]
-		if colspans[i] > 1 {
-			b.Value = fmt.Sprintf("%d-%d", i+colspans[i]-1, i)
-			i += colspans[i]
-		} else {
-			b.Value = fmt.Sprintf("%d", i)
-			i++
-		}
-		bitNumbers = append(bitNumbers, b)
-	}
-
-	// Generate Field names
-	var bitNames []bitField
-	for i := int32(0); i < 32; {
-		var b bitField
-		f, ok := fmap[i]
-		b.Colspan = colspans[i]
-		b.Value = f.Name
-		b.Reserved = !ok
-		if colspans[i] > 1 {
-			if !ok {
-				b.Value = "Reserved"
-			}
-			i += colspans[i]
-
-		} else {
-			if !ok {
-				b.Value = "-"
-			}
-			i++
-		}
-		bitNames = append(bitNames, b)
-	}
-	slices.Reverse(bitNumbers)
-	slices.Reverse(bitNames)
-	return bitNumbers, bitNames
-}
-
-func BitNumbersFrag(bs []bitField) goht.Template {
+func BitNumbersFrag(bs []helpers.BitField) goht.Template {
 	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
 		__buf, __isBuf := __w.(goht.Buffer)
 		if !__isBuf {
@@ -163,7 +82,7 @@ func BitNumbersFrag(bs []bitField) goht.Template {
 	})
 }
 
-func FieldNamesFrag(bs []bitField) goht.Template {
+func FieldNamesFrag(bs []helpers.BitField) goht.Template {
 	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
 		__buf, __isBuf := __w.(goht.Buffer)
 		if !__isBuf {
@@ -271,7 +190,7 @@ func generateTable(fields []dbstore.Field) goht.Template {
 		var __children goht.Template
 		ctx, __children = goht.PopChildren(ctx)
 		_ = __children
-		bnums, bnames := generateFieldDiagram(fields)
+		bnums, bnames := helpers.GenerateFieldDiagram(fields)
 		if _, __err = __buf.WriteString("<!--Bit numbers-->\n<tr class=\"bit-numbers\">\n"); __err != nil {
 			return
 		}
