@@ -14,7 +14,7 @@ import (
 	"slices"
 )
 
-type BitField struct {
+type bitField struct {
 	Colspan  int32
 	Value    string
 	Reserved bool
@@ -29,7 +29,7 @@ func displayBits(numbits, offset int32) string {
 	return fmt.Sprintf("[%v:%v]", be, bs)
 }
 
-func generateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
+func generateFieldDiagram(fields []dbstore.Field) ([]bitField, []bitField) {
 	// convert into a map
 	fmap := make(map[int32]dbstore.Field, len(fields))
 	for _, f := range fields {
@@ -60,14 +60,14 @@ func generateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
 		}
 	}
 
-	// Bit numbers
-	var bitNumbers []BitField
+	// Generate Bit numbers
+	var bitNumbers []bitField
 
 	for i := int32(0); i < 32; {
-		var b BitField
+		var b bitField
 		b.Colspan = colspans[i]
 		if colspans[i] > 1 {
-			b.Value = fmt.Sprintf("%d-%d", i, i+colspans[i]-1)
+			b.Value = fmt.Sprintf("%d-%d", i+colspans[i]-1, i)
 			i += colspans[i]
 		} else {
 			b.Value = fmt.Sprintf("%d", i)
@@ -76,36 +76,34 @@ func generateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
 		bitNumbers = append(bitNumbers, b)
 	}
 
-	// Field names
-	var bitNames []BitField
+	// Generate Field names
+	var bitNames []bitField
 	for i := int32(0); i < 32; {
-		var b BitField
+		var b bitField
 		f, ok := fmap[i]
 		b.Colspan = colspans[i]
+		b.Value = f.Name
 		b.Reserved = !ok
 		if colspans[i] > 1 {
 			if !ok {
 				b.Value = "Reserved"
-			} else {
-				b.Value = f.Name
 			}
 			i += colspans[i]
 
 		} else {
 			if !ok {
 				b.Value = "-"
-			} else {
-				b.Value = f.Name
 			}
 			i++
 		}
 		bitNames = append(bitNames, b)
 	}
-
+	slices.Reverse(bitNumbers)
+	slices.Reverse(bitNames)
 	return bitNumbers, bitNames
 }
 
-func BitNumbersFrag(bs []BitField) goht.Template {
+func BitNumbersFrag(bs []bitField) goht.Template {
 	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
 		__buf, __isBuf := __w.(goht.Buffer)
 		if !__isBuf {
@@ -165,7 +163,7 @@ func BitNumbersFrag(bs []BitField) goht.Template {
 	})
 }
 
-func FieldNamesFrag(bs []BitField) goht.Template {
+func FieldNamesFrag(bs []bitField) goht.Template {
 	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
 		__buf, __isBuf := __w.(goht.Buffer)
 		if !__isBuf {

@@ -7,7 +7,7 @@ import (
 	"github.com/wolfmanjm/svd_web/internal/database"
 )
 
-type BitField struct {
+type bitField struct {
 	Colspan int32
 	Value string
 	Reserved bool
@@ -22,7 +22,7 @@ func displayBits(numbits, offset int32) string {
 	return fmt.Sprintf("[%v:%v]", be, bs)
 }
 
-func generateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
+func generateFieldDiagram(fields []dbstore.Field) ([]bitField, []bitField) {
 	// convert into a map
 	fmap := make(map[int32]dbstore.Field, len(fields))
 	for _, f := range fields {
@@ -53,14 +53,14 @@ func generateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
 		}
 	}
 
-	// Bit numbers
-	var bitNumbers []BitField
+	// Generate Bit numbers
+	var bitNumbers []bitField
 
 	for i := int32(0); i < 32; {
-		var b BitField
+		var b bitField
 		b.Colspan = colspans[i]
 		if colspans[i] > 1 {
-			b.Value = fmt.Sprintf("%d-%d", i, i+colspans[i]-1)
+			b.Value = fmt.Sprintf("%d-%d", i+colspans[i]-1, i)
 			i += colspans[i]
 		} else {
 			b.Value = fmt.Sprintf("%d", i)
@@ -69,37 +69,35 @@ func generateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
 		bitNumbers = append(bitNumbers, b)
 	}
 
-	// Field names
- 	var bitNames []BitField
+	// Generate Field names
+ 	var bitNames []bitField
 	for i := int32(0); i < 32; {
-		var b BitField
+		var b bitField
 		f, ok := fmap[i]
 		b.Colspan = colspans[i]
+		b.Value = f.Name
 		b.Reserved = !ok
 		if colspans[i] > 1 {
 			if !ok {
 				b.Value = "Reserved"
-			} else {
-				b.Value = f.Name
 			}
 			i += colspans[i]
 
 		} else {
 			if !ok {
 				b.Value = "-"
-			} else {
-				b.Value = f.Name
 			}
 			i++
 		}
 		bitNames = append(bitNames, b)
 	}
-
+	slices.Reverse(bitNumbers)
+	slices.Reverse(bitNames)
 	return bitNumbers, bitNames
 }
 
 
-@haml BitNumbersFrag(bs []BitField) {
+@haml BitNumbersFrag(bs []bitField) {
 	/ Bit numbers
 	%tr.bit-numbers
 		- for _, b := range bs
@@ -109,7 +107,7 @@ func generateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
 				%td= b.Value
 }
 
-@haml FieldNamesFrag(bs []BitField) {
+@haml FieldNamesFrag(bs []bitField) {
 	/ Field Names
 	%tr.bit-fields
 		- for _, b := range bs
