@@ -24,6 +24,12 @@ import (
 		"hx-include": "[name='pattern']"
 		}
 
+	%link_to.backto-item{
+	"hx-get": #{fmt.Sprintf("/peripherals/%d", m.ID)},
+	"hx-swap": "innerHTML",
+	"hx-target": "#contentArea.content"
+	} Back to Peripherals
+
 	.registers
 		- for _, r := range regs
 			- name := r.Name

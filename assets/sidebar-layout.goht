@@ -97,6 +97,19 @@ func firstLine(str string) string {
 						color: #bdc3c7;
 				}
 
+				.backto-item {
+						text-decoration: none;
+						padding-bottom: 2px;
+						border-bottom: 1px solid #8d8df3;
+						color: blue;
+						cursor: pointer;
+				}
+
+				.backto-item:hover {
+						background-color: #34495e;
+				}
+
+
 				/* Right Column - Content Area */
 				.content {
 						flex: 1;

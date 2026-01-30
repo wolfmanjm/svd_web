@@ -61,6 +61,12 @@ func displayBits(numbits, offset int32) string {
 		%h1 Bit Fields for #{r.Name} of #{p.Name}
 		%p.subtitle Reference Guide for #{m.Name}
 
+	%link_to.backto-item{
+	"hx-get": #{fmt.Sprintf("/registers/%d", p.ID)},
+	"hx-swap": "innerHTML",
+	"hx-target": "#contentArea.content"
+	} Back to Registers
+
 	.register-diagram
 		%table.bit-field-table
 			= @render generateTable(fields)
