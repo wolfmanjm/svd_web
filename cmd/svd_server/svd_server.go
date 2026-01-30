@@ -25,7 +25,8 @@ func Server(cstr string) error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if hx.IsHtmx(r) {
-			hx.Response(w, hx.Redirect("/"))
+			http.Error(w, "Illegal HTMX URL: " + r.RequestURI, 200)
+		// hx.Response(w, hx.Redirect("/"))
 		} else if r.RequestURI == "/" {
 			//_ = assets.SiteLayout().Render(r.Context(), w)
 			assets.SidebarLayout(db, mpus).Render(r.Context(), w)

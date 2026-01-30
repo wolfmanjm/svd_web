@@ -43,7 +43,7 @@ func ShowPeripherals(db *database.Database, periphs []dbstore.Peripheral) goht.T
 		if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/findperipherals/%d", p.MpuID)) + "\""); __err != nil {
 			return
 		}
-		if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\" hx-include=\"[name=&#39;pattern&#39;]\"></div>\n"); __err != nil {
+		if _, __err = __buf.WriteString(" hx-swap=\"outerHTML\" hx-target=\".peripherals\" hx-select=\".peripherals\" hx-include=\"[name=&#39;pattern&#39;]\"></div>\n<div class=\"peripherals\">\n"); __err != nil {
 			return
 		}
 		for _, p := range periphs {
@@ -117,6 +117,9 @@ func ShowPeripherals(db *database.Database, periphs []dbstore.Peripheral) goht.T
 			if _, __err = __buf.WriteString("</div>\n</div>\n"); __err != nil {
 				return
 			}
+		}
+		if _, __err = __buf.WriteString("</div>\n"); __err != nil {
+			return
 		}
 		if !__isBuf {
 			_, __err = __w.Write(__buf.Bytes())

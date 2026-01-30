@@ -18,21 +18,24 @@ import (
 		type: "search",
 		"hx-get": #{fmt.Sprintf("/findperipherals/%d", p.MpuID)},
 		"hx-swap": "innerHTML",
-		"hx-target": "#contentArea.content",
+		"hx-target": ".peripherals",
+		"hx-select": ".peripherals",
+		"hx-swap": "outerHTML",
 		"hx-include": "[name='pattern']"
 		}
 
-	- for _, p := range periphs
-		- name := p.Name
-		.peripheral{data-name: #{name} }
-		.peripheral-header{"hx-get": #{fmt.Sprintf("/registers/%d", p.ID)}, "hx-swap": "innerHTML", "hx-target": "#contentArea.content"}
-			%div
-				%span.peripheral-name #{name}
-				%span.peripheral-address #{p.BaseAddress}
-				- if p.DerivedFromID.Valid
-					- p2 := db.GetPeripheral(p.DerivedFromID.Int32)
-						%span.peripheral-description Same as #{p2.Name}
-				- if p.Description.Valid
-					%br
-					%span.peripheral-description #{p.Description.String}
+	.peripherals
+		- for _, p := range periphs
+			- name := p.Name
+			.peripheral{data-name: #{name} }
+			.peripheral-header{"hx-get": #{fmt.Sprintf("/registers/%d", p.ID)}, "hx-swap": "innerHTML", "hx-target": "#contentArea.content"}
+				%div
+					%span.peripheral-name #{name}
+					%span.peripheral-address #{p.BaseAddress}
+					- if p.DerivedFromID.Valid
+						- p2 := db.GetPeripheral(p.DerivedFromID.Int32)
+							%span.peripheral-description Same as #{p2.Name}
+					- if p.Description.Valid
+						%br
+						%span.peripheral-description #{p.Description.String}
 }
