@@ -102,6 +102,19 @@ func (db *Database) GetRegister(rid int32) dbstore.Register {
 	return r
 }
 
+// return registers that match the pattern
+func (db *Database) FindRegisters(id int32, pat string) ([]dbstore.Register, error) {
+	args := dbstore.FindRegistersParams {
+		PeripheralID: id,
+		Name: "%" + pat + "%",
+	}
+	p, err := db.queries.FindRegisters(db.ctx, args)
+	if err != nil {
+		return p, fmt.Errorf("findRegisters - %w", err)
+	}
+	return p, nil
+}
+
 // Get fields for the specified register
 func (db *Database) GetFields(rid int32) ([]dbstore.Field, error) {
 

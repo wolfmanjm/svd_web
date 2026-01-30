@@ -2,13 +2,28 @@ package assets
 import (
 	"fmt"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
+	"github.com/wolfmanjm/svd_web/internal/database"
 )
 
-@haml ShowRegisters(mpuname, pername string, regs []dbstore.Register) {
+@haml ShowRegisters(db *database.Database, regs []dbstore.Register) {
 	%header
-		%h1 Registers for #{pername}
-		%p.subtitle Reference Guide for #{mpuname}
-		/%button{"hx-get": #{fmt.Sprintf("/peripherals/1")}, "hx-swap": "innerHTML", "hx-target": "#contentArea.content"} Back
+		- p := db.GetPeripheral(regs[0].PeripheralID)
+		- m := db.GetMpu(p.MpuID)
+		%h1 Registers for #{p.Name}
+		%p.subtitle Reference Guide for #{m.Name}
+	.search-bar
+		%input#searchInput{
+		name: "pattern",
+		placeholder: "Filter registers...",
+		type: "search",
+		"hx-get": #{fmt.Sprintf("/findregisters/%d", p.ID)},
+		"hx-swap": "innerHTML",
+		"hx-target": ".registers",
+		"hx-select": ".registers",
+		"hx-swap": "outerHTML",
+		"hx-include": "[name='pattern']"
+		}
+
 	.registers
 		- for _, r := range regs
 			- name := r.Name

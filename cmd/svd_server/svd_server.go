@@ -25,7 +25,8 @@ func Server(cstr string) error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if hx.IsHtmx(r) {
-			http.Error(w, "Illegal HTMX URL: " + r.RequestURI, 200)
+			hx.Response(w, hx.Retarget("#contentArea.content"), hx.Reselect(".error"), hx.SwapInnerHtml)
+			http.Error(w, "<div class='error'> Illegal HTMX URL: " + r.RequestURI + "</div>", 200)
 		// hx.Response(w, hx.Redirect("/"))
 		} else if r.RequestURI == "/" {
 			//_ = assets.SiteLayout().Render(r.Context(), w)
@@ -84,12 +85,27 @@ func Server(cstr string) error {
 		// Note this will get registers from a Derived From peripheral if needed
 		regs, err := db.GetRegisters(int32(pid))
 		if err == nil && len(regs) > 0 {
-			p := db.GetPeripheral(int32(pid))
-			mpu := db.GetMpu(p.MpuID)
-			assets.ShowRegisters(mpu.Name, p.Name, regs).Render(r.Context(), w)
+			assets.ShowRegisters(db, regs).Render(r.Context(), w)
 		} else {
+			http.Error(w, "Register not found", 200)
+		}
+	})
+
+	mux.HandleFunc("/findregisters/{id}", func(w http.ResponseWriter, r *http.Request) {
+		if !hx.IsHtmx(r) {
 			http.NotFound(w, r)
-			// http.Error(w, "Register not found", 404)
+			return
+		}
+		pat := r.URL.Query().Get("pattern")
+		idString := r.PathValue("id")
+		id, _ := strconv.Atoi(idString)
+		regs, err := db.FindRegisters(int32(id), pat)
+		if err != nil {
+			hx.Response(w, hx.Retarget("/"))
+		} else if len(regs) > 0 {
+			assets.ShowRegisters(db, regs).Render(r.Context(), w)
+		} else {
+			http.Error(w, "No Registers match", 200)
 		}
 	})
 

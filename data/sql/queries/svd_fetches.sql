@@ -44,6 +44,12 @@ SELECT *
 FROM registers
 WHERE peripheral_id = $1 AND lower(name) LIKE lower(@name::text);
 
+-- name: FindRegisters :many
+SELECT *
+FROM registers
+WHERE peripheral_id = $1 AND lower(name) LIKE lower(@name::text)
+ORDER BY name;
+
 -- name: GetRegister :one
 SELECT *
 FROM registers

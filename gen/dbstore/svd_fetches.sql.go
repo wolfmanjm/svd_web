@@ -210,6 +210,45 @@ func (q *Queries) FindRegister(ctx context.Context, arg FindRegisterParams) (Reg
 	return i, err
 }
 
+const findRegisters = `-- name: FindRegisters :many
+SELECT id, peripheral_id, name, address_offset, reset_value, description
+FROM registers
+WHERE peripheral_id = $1 AND lower(name) LIKE lower($2::text)
+ORDER BY name
+`
+
+type FindRegistersParams struct {
+	PeripheralID int32
+	Name         string
+}
+
+func (q *Queries) FindRegisters(ctx context.Context, arg FindRegistersParams) ([]Register, error) {
+	rows, err := q.db.Query(ctx, findRegisters, arg.PeripheralID, arg.Name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Register
+	for rows.Next() {
+		var i Register
+		if err := rows.Scan(
+			&i.ID,
+			&i.PeripheralID,
+			&i.Name,
+			&i.AddressOffset,
+			&i.ResetValue,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMCU = `-- name: GetMCU :one
 SELECT id, name, description
 FROM mpus

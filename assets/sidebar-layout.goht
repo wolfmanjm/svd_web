@@ -40,7 +40,7 @@ func firstLine(str string) string {
 				.container {
 						display: flex;
 						height: 100vh;
-						max-width: 1200px;
+						max-width: 2000px;
 						margin: 0 auto;
 						background: white;
 						border-radius: 12px;

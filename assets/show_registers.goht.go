@@ -9,9 +9,10 @@ import "github.com/stackus/goht"
 import (
 	"fmt"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
+	"github.com/wolfmanjm/svd_web/internal/database"
 )
 
-func ShowRegisters(mpuname, pername string, regs []dbstore.Register) goht.Template {
+func ShowRegisters(db *database.Database, regs []dbstore.Register) goht.Template {
 	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
 		__buf, __isBuf := __w.(goht.Buffer)
 		if !__isBuf {
@@ -21,11 +22,16 @@ func ShowRegisters(mpuname, pername string, regs []dbstore.Register) goht.Templa
 		var __children goht.Template
 		ctx, __children = goht.PopChildren(ctx)
 		_ = __children
-		if _, __err = __buf.WriteString("<header>\n<h1>Registers for "); __err != nil {
+		if _, __err = __buf.WriteString("<header>\n"); __err != nil {
+			return
+		}
+		p := db.GetPeripheral(regs[0].PeripheralID)
+		m := db.GetMpu(p.MpuID)
+		if _, __err = __buf.WriteString("<h1>Registers for "); __err != nil {
 			return
 		}
 		var __var1 string
-		if __var1, __err = goht.CaptureErrors(goht.EscapeString(pername)); __err != nil {
+		if __var1, __err = goht.CaptureErrors(goht.EscapeString(p.Name)); __err != nil {
 			return
 		}
 		if _, __err = __buf.WriteString(__var1); __err != nil {
@@ -35,13 +41,19 @@ func ShowRegisters(mpuname, pername string, regs []dbstore.Register) goht.Templa
 			return
 		}
 		var __var2 string
-		if __var2, __err = goht.CaptureErrors(goht.EscapeString(mpuname)); __err != nil {
+		if __var2, __err = goht.CaptureErrors(goht.EscapeString(m.Name)); __err != nil {
 			return
 		}
 		if _, __err = __buf.WriteString(__var2); __err != nil {
 			return
 		}
-		if _, __err = __buf.WriteString("</p>\n<!--%button{&#34;hx-get&#34;: #{fmt.Sprintf(&#34;/peripherals/1&#34;)}, &#34;hx-swap&#34;: &#34;innerHTML&#34;, &#34;hx-target&#34;: &#34;#contentArea.content&#34;} Back-->\n</header>\n<div class=\"registers\">\n"); __err != nil {
+		if _, __err = __buf.WriteString("</p>\n</header>\n<div class=\"search-bar\">\n<input id=\"searchInput\" name=\"pattern\" placeholder=\"Filter registers...\" type=\"search\" hx-get=\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/findregisters/%d", p.ID)) + "\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(" hx-swap=\"outerHTML\" hx-target=\".registers\" hx-select=\".registers\" hx-include=\"[name=&#39;pattern&#39;]\"></div>\n<div class=\"registers\">\n"); __err != nil {
 			return
 		}
 		for _, r := range regs {
