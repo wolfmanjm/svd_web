@@ -59,7 +59,7 @@ func ShowRegisters(db *database.Database, regs []dbstore.Register) goht.Template
 		if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/peripherals/%d", m.ID)) + "\""); __err != nil {
 			return
 		}
-		if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\">Back to Peripherals</link_to>\n<div class=\"registers\">\n"); __err != nil {
+		if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\">&#8678; Back to Peripherals</link_to>\n<div class=\"registers\">\n"); __err != nil {
 			return
 		}
 		for _, r := range regs {

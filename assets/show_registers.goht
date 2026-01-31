@@ -28,7 +28,7 @@ import (
 	"hx-get": #{fmt.Sprintf("/peripherals/%d", m.ID)},
 	"hx-swap": "innerHTML",
 	"hx-target": "#contentArea.content"
-	} Back to Peripherals
+	} &#8678; Back to Peripherals
 
 	.registers
 		- for _, r := range regs

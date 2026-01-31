@@ -1,18 +1,18 @@
-DSN="host=pi5.local port=5432 user=morris password=test dbname=svd sslmode=disable"
+DSN?="host=pi5.local port=5432 user=morris password=test dbname=svd sslmode=disable"
 
 .PHONY: assets
 assets:			## build all the HAML assets
 	goht generate --path assets
 
 migrate/up:		## migrate up
-	goose postgres ${DSN} -dir data/sql/migrations up
+	goose postgres "${DSN}" -dir data/sql/migrations up
 
 migrate/down:		## Migrate down to previous migration
-	goose postgres ${DSN} -dir data/sql/migrations down
+	goose postgres "${DSN}" -dir data/sql/migrations down
 
 migrate/fresh: 		## Create a fresh database
 	@echo "Dropping..."
-	@goose postgres ${DSN} -dir data/sql/migrations reset
+	@goose postgres "${DSN}" -dir data/sql/migrations reset
 	@make migrate/up
 
 sql:			## Generate the sqlc helpers

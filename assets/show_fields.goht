@@ -65,7 +65,7 @@ func displayBits(numbits, offset int32) string {
 	"hx-get": #{fmt.Sprintf("/registers/%d", p.ID)},
 	"hx-swap": "innerHTML",
 	"hx-target": "#contentArea.content"
-	} Back to Registers
+	} &#8678; Back to Registers
 
 	.register-diagram
 		%table.bit-field-table

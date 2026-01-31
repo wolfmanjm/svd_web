@@ -262,7 +262,7 @@ func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
 		if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/registers/%d", p.ID)) + "\""); __err != nil {
 			return
 		}
-		if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\">Back to Registers</link_to>\n<div class=\"register-diagram\">\n<table class=\"bit-field-table\">\n"); __err != nil {
+		if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\">&#8678; Back to Registers</link_to>\n<div class=\"register-diagram\">\n<table class=\"bit-field-table\">\n"); __err != nil {
 			return
 		}
 		if __err = generateTable(fields).Render(ctx, __buf); __err != nil {
