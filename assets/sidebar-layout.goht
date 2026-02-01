@@ -167,7 +167,7 @@ func firstLine(str string) string {
 				}
 
 				.peripherals {
-					height: 65vh;
+					height: calc(100vh - 300px);
 					overflow-y: auto;
 				}
 
@@ -227,7 +227,7 @@ func firstLine(str string) string {
 				}
 
 				.registers {
-						height: 65vh;
+						height: calc(100vh - 380px);
 						padding: 20px;
 						background: white;
 						overflow-y: auto;
@@ -292,7 +292,7 @@ func firstLine(str string) string {
 				}
 
 				.fields {
-					height: 60vh;
+					height: calc(100vh - 400px);
 					overflow-y: auto;
 				}
 
