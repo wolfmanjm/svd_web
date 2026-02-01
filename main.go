@@ -7,7 +7,6 @@ import (
 
 	add_svd "github.com/wolfmanjm/svd_web/cmd/add-svd"
 	"github.com/wolfmanjm/svd_web/cmd/svd_server"
-	test_svd "github.com/wolfmanjm/svd_web/cmd/test_svd"
 )
 
 //go:embed files/*
@@ -38,13 +37,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	if cmd == "test" {
-		err := test_svd.Test(url)
-		if err != nil {
-			panic(err)
-		}
-		os.Exit(0)
-	}
+//	if cmd == "test" {
+//		err := test_svd.Test(url)
+//		if err != nil {
+//			panic(err)
+//		}
+//		os.Exit(0)
+//	}
 
 	err := svd_server.Server(url, staticFiles)
 	if err != nil {

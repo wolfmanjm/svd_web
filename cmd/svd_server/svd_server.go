@@ -30,7 +30,6 @@ func Server(cstr string, staticFiles embed.FS) error {
 			http.Error(w, "<div class='error'> Illegal HTMX URL: " + r.RequestURI + "</div>", 200)
 		// hx.Response(w, hx.Redirect("/"))
 		} else if r.RequestURI == "/" {
-			//_ = assets.SiteLayout().Render(r.Context(), w)
 			assets.SidebarLayout(db, mpus).Render(r.Context(), w)
 		} else {
 			http.NotFound(w, r)
