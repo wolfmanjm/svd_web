@@ -17,7 +17,6 @@ import (
 		placeholder: "Filter peripherals...",
 		type: "search",
 		"hx-get": #{fmt.Sprintf("/findperipherals/%d", p.MpuID)},
-		"hx-swap": "innerHTML",
 		"hx-target": ".peripherals",
 		"hx-select": ".peripherals",
 		"hx-swap": "outerHTML",
@@ -28,7 +27,11 @@ import (
 		- for _, p := range periphs
 			- name := p.Name
 			.peripheral{data-name: #{name} }
-			.peripheral-header{"hx-get": #{fmt.Sprintf("/registers/%d", p.ID)}, "hx-swap": "innerHTML", "hx-target": "#contentArea.content"}
+			.peripheral-header{
+			"hx-get": #{fmt.Sprintf("/registers/%d", p.ID)},
+			"hx-swap": "innerHTML scroll:top",
+			"hx-target": "#contentArea.content"
+			}
 				%div
 					%span.peripheral-name #{name}
 					%span.peripheral-address #{p.BaseAddress}

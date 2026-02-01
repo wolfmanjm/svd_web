@@ -71,12 +71,13 @@ func displayBits(numbits, offset int32) string {
 		%table.bit-field-table
 			= @render generateTable(fields)
 
-	.register-fields
-		- for _, f := range fields
-			.field
-				.field-bits= displayBits(f.NumBits, f.BitOffset)
-				.field-name #{f.Name}
-			- if f.Description.Valid
-				.field-desc #{f.Description.String}
+	.fields
+		.register-fields
+			- for _, f := range fields
+				.field
+					.field-bits= displayBits(f.NumBits, f.BitOffset)
+					.field-name #{f.Name}
+				- if f.Description.Valid
+					.field-desc #{f.Description.String}
 
 }

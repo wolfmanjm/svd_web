@@ -268,7 +268,7 @@ func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
 		if __err = generateTable(fields).Render(ctx, __buf); __err != nil {
 			return
 		}
-		if _, __err = __buf.WriteString("</table>\n</div>\n<div class=\"register-fields\">\n"); __err != nil {
+		if _, __err = __buf.WriteString("</table>\n</div>\n<div class=\"fields\">\n<div class=\"register-fields\">\n"); __err != nil {
 			return
 		}
 		for _, f := range fields {
@@ -311,7 +311,7 @@ func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
 				}
 			}
 		}
-		if _, __err = __buf.WriteString("</div>\n"); __err != nil {
+		if _, __err = __buf.WriteString("</div>\n</div>\n"); __err != nil {
 			return
 		}
 		if !__isBuf {

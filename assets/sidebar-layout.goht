@@ -33,19 +33,17 @@ func firstLine(str string) string {
 						font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 						background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 						padding: 20px;
-						height: 100vh;
-						overflow: hidden;
+						height: 95vh;
 				}
 
 				.container {
 						display: flex;
-						height: 100vh;
+						height: 95vh;
 						max-width: 2000px;
 						margin: 0 auto;
 						background: white;
 						border-radius: 12px;
 						box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-						overflow: hidden;
 				}
 
 				/* Left Column - Sidebar */
@@ -113,8 +111,9 @@ func firstLine(str string) string {
 				/* Right Column - Content Area */
 				.content {
 						flex: 1;
+						height: 95vh;
 						background-color: #ecf0f1;
-						overflow-y: auto;
+						overflow-y: hidden;
 						padding: 40px;
 				}
 
@@ -167,11 +166,15 @@ func firstLine(str string) string {
 						border-color: #667eea;
 				}
 
+				.peripherals {
+					height: 65vh;
+					overflow-y: auto;
+				}
+
 				.peripheral {
 						margin-bottom: 20px;
 						border: 1px solid #e2e8f0;
 						border-radius: 8px;
-						overflow: hidden;
 						transition: box-shadow 0.3s;
 				}
 
@@ -224,8 +227,10 @@ func firstLine(str string) string {
 				}
 
 				.registers {
+						height: 65vh;
 						padding: 20px;
 						background: white;
+						overflow-y: auto;
 				}
 
 				.peripheral.active .registers {
@@ -284,6 +289,11 @@ func firstLine(str string) string {
 						margin-bottom: 10px;
 						text-transform: uppercase;
 						letter-spacing: 0.5px;
+				}
+
+				.fields {
+					height: 60vh;
+					overflow-y: auto;
 				}
 
 				.field {
@@ -389,7 +399,11 @@ func firstLine(str string) string {
 						%h2 MCU list
 					%ul#menuList.menu-list
 						- for _, m := range mcus
-							%li.menu-item{"hx-get": #{fmt.Sprintf("/peripherals/%d", m.ID)}, "hx-swap": "innerHTML", "hx-target": "#contentArea.content"}
+							%li.menu-item{
+							"hx-get": #{fmt.Sprintf("/peripherals/%d", m.ID)},
+							"hx-swap": "innerHTML scroll:top",
+							"hx-target": "#contentArea.content"
+							}
 								%h3= m.Name
 								- if m.Description.Valid
 									%p= firstLine(m.Description.String)

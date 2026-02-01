@@ -17,7 +17,6 @@ import (
 		placeholder: "Filter registers...",
 		type: "search",
 		"hx-get": #{fmt.Sprintf("/findregisters/%d", p.ID)},
-		"hx-swap": "innerHTML",
 		"hx-target": ".registers",
 		"hx-select": ".registers",
 		"hx-swap": "outerHTML",
@@ -26,7 +25,7 @@ import (
 
 	%link_to.backto-item{
 	"hx-get": #{fmt.Sprintf("/peripherals/%d", m.ID)},
-	"hx-swap": "innerHTML",
+	"hx-swap": "innerHTML scroll:top",
 	"hx-target": "#contentArea.content"
 	} &#8678; Back to Peripherals
 

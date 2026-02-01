@@ -43,7 +43,7 @@ func ShowPeripherals(db *database.Database, periphs []dbstore.Peripheral) goht.T
 		if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/findperipherals/%d", p.MpuID)) + "\""); __err != nil {
 			return
 		}
-		if _, __err = __buf.WriteString(" hx-swap=\"outerHTML\" hx-target=\".peripherals\" hx-select=\".peripherals\" hx-include=\"[name=&#39;pattern&#39;]\"></div>\n<div class=\"peripherals\">\n"); __err != nil {
+		if _, __err = __buf.WriteString(" hx-target=\".peripherals\" hx-select=\".peripherals\" hx-swap=\"outerHTML\" hx-include=\"[name=&#39;pattern&#39;]\"></div>\n<div class=\"peripherals\">\n"); __err != nil {
 			return
 		}
 		for _, p := range periphs {
@@ -60,7 +60,7 @@ func ShowPeripherals(db *database.Database, periphs []dbstore.Peripheral) goht.T
 			if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/registers/%d", p.ID)) + "\""); __err != nil {
 				return
 			}
-			if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\">\n<div>\n<span class=\"peripheral-name\">"); __err != nil {
+			if _, __err = __buf.WriteString(" hx-swap=\"innerHTML scroll:top\" hx-target=\"#contentArea.content\">\n<div>\n<span class=\"peripheral-name\">"); __err != nil {
 				return
 			}
 			var __var2 string
