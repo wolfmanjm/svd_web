@@ -16,11 +16,18 @@ func firstLine(str string) string {
 	!!!
 	%html{lang: "en"}
 		%head
-			%meta{content: "text/html; charset=UTF-8", http-equiv: "Content-Type"}/
-			%meta{charset: "UTF-8"}/
-			%meta{content: "width=device-width, initial-scale=1.0", name: "viewport"}/
+			%meta{content: "text/html; charset=UTF-8", http-equiv: "Content-Type"}
+			%meta{charset: "UTF-8"}
+			%meta{content: "width=device-width, initial-scale=1.0", name: "viewport"}
 			%title Technical guide for MCUs
-			%script{src: "https://unpkg.com/htmx.org"}
+
+			%script{src: "files/htmx.js"}
+
+			%link{href:"files/registers.css", rel: "stylesheet"}
+
+			%link{href:"files/peripherals.css", rel: "stylesheet"}
+
+			%link{href:"files/fields.css", rel: "stylesheet"}
 
 			:css
 				* {
@@ -166,113 +173,6 @@ func firstLine(str string) string {
 						border-color: #667eea;
 				}
 
-				.peripherals {
-					height: calc(100vh - 300px);
-					overflow-y: auto;
-				}
-
-				.peripheral {
-						margin-bottom: 20px;
-						border: 1px solid #e2e8f0;
-						border-radius: 8px;
-						transition: box-shadow 0.3s;
-				}
-
-				.peripheral:hover {
-						box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-				}
-
-				.peripheral-header {
-						background: #edf2f7;
-						padding: 15px 20px;
-						cursor: pointer;
-						display: flex;
-						justify-content: space-between;
-						align-items: center;
-						user-select: none;
-				}
-
-				.peripheral-header:hover {
-						background: #e2e8f0;
-				}
-
-				.peripheral-name {
-						font-weight: 600;
-						font-size: 1.1em;
-						color: #2d3748;
-				}
-
-				.peripheral-address {
-						color: #718096;
-						font-family: 'Courier New', monospace;
-						font-weight: bold;
-						font-size: 1.0em;
-				}
-
-				.peripheral-description {
-						color: #718096;
-						font-family: 'Courier New';
-						font-size: 0.9em;
-						white-space: pre-line;
-				}
-
-				.toggle-icon {
-						color: #667eea;
-						font-weight: bold;
-						transition: transform 0.3s;
-				}
-
-				.peripheral.active .toggle-icon {
-						transform: rotate(180deg);
-				}
-
-				.registers {
-						height: calc(100vh - 380px);
-						padding: 20px;
-						background: white;
-						overflow-y: auto;
-				}
-
-				.peripheral.active .registers {
-						display: block;
-				}
-
-				.register {
-						padding: 12px;
-						border-left: 3px solid #667eea;
-						background: #f7fafc;
-						margin-bottom: 10px;
-						border-radius: 4px;
-						transition: box-shadow 0.3s;
-				}
-				.register:hover {
-						box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-				}
-
-				.register-name {
-						font-weight: 600;
-						color: #2d3748;
-						font-family: 'Courier New', monospace;
-				}
-
-				.register-offset {
-						color: #718096;
-						font-size: 0.85em;
-						margin-left: 10px;
-				}
-
-				.register-desc {
-						color: #4a5568;
-						font-size: 0.9em;
-						margin-top: 5px;
-						white-space: pre-line;
-				}
-
-				.no-results {
-						text-align: center;
-						padding: 40px;
-						color: #718096;
-				}
 
 				.register-fields {
 						margin-top: 15px;
@@ -281,115 +181,6 @@ func firstLine(str string) string {
 						border: 1px solid #e2e8f0;
 						border-radius: 6px;
 				}
-
-				.fields-header {
-						font-size: 0.85em;
-						font-weight: 600;
-						color: #4a5568;
-						margin-bottom: 10px;
-						text-transform: uppercase;
-						letter-spacing: 0.5px;
-				}
-
-				.fields {
-					height: calc(100vh - 400px);
-					overflow-y: auto;
-				}
-
-				.field {
-					display: grid;
-					grid-template-columns: 80px 120px;
-					gap: 15px;
-					padding: 10px;
-					border-bottom: 1px solid #f7fafc;
-					align-items: start;
-				}
-
-				.field-bits {
-					font-family: 'Courier New', monospace;
-					font-weight: 600;
-					color: #667eea;
-					font-size: 0.9em;
-				}
-
-				.field-name {
-					font-family: 'Courier New', monospace;
-					font-weight: 600;
-					color: #2d3748;
-					font-size: 0.9em;
-				}
-
-				.field-desc {
-					color: #4a5568;
-					font-size: 0.85em;
-					margin-left: 80px;
-					white-space: pre-line;
-				}
-
-				.register-diagram {
-						margin: 15px 0;
-						overflow-x: auto;
-				}
-
-				/* Field diagram */
-				.bit-field-table {
-						width: 100%;
-						border-collapse: collapse;
-						font-family: 'Courier New', monospace;
-						font-size: 0.85em;
-						min-width: 600px;
-				}
-
-				.bit-numbers {
-						background: #2d3748;
-						color: white;
-						text-align: center;
-						font-weight: 600;
-				}
-
-				.bit-numbers td {
-						padding: 6px 4px;
-						border: 1px solid #1a202c;
-						font-size: 0.75em;
-				}
-
-				.bit-fields td {
-						padding: 20px 8px;
-						border: 2px solid #2d3748;
-						text-align: center;
-						background: #edf2f7;
-						font-weight: 600;
-						position: relative;
-				}
-
-				.bit-fields td.reserved {
-						background: #f7fafc;
-						color: #a0aec0;
-						font-style: italic;
-				}
-
-				.bit-fields td.rw {
-						background: #e6fffa;
-				}
-
-				.bit-fields td.ro {
-						background: #fef3c7;
-				}
-
-				.bit-fields td.wo {
-						background: #dbeafe;
-				}
-
-				.reset-values td {
-						padding: 6px 4px;
-						border: 1px solid #cbd5e0;
-						text-align: center;
-						background: #f7fafc;
-						color: #718096;
-						font-size: 0.75em;
-				}
-
-
 
 		%body
 			.container

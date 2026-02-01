@@ -5,6 +5,7 @@ go 1.25.5
 require (
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/stackus/goht v0.8.3
+	modernc.org/sqlite v1.44.3
 )
 
 require (
@@ -18,7 +19,6 @@ require (
 	modernc.org/libc v1.67.6 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.44.3 // indirect
 )
 
 require (

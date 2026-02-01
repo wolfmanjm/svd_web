@@ -1,16 +1,17 @@
 package svd_server
 
 import (
+	"embed"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/stackus/hxgo"
 	"github.com/wolfmanjm/svd_web/assets"
 	"github.com/wolfmanjm/svd_web/internal/database"
-	"github.com/stackus/hxgo"
 )
 
-func Server(cstr string) error {
+func Server(cstr string, staticFiles embed.FS) error {
 	db, err := database.Setup(cstr)
 	if err != nil {
 		return fmt.Errorf("database setup - %w", err)
@@ -35,6 +36,9 @@ func Server(cstr string) error {
 			http.NotFound(w, r)
 		}
 	})
+
+	// serve static files like htmx.js and the css files
+	mux.Handle("/files/", http.FileServerFS(staticFiles))
 
 	mux.HandleFunc("/peripherals/{id}", func(w http.ResponseWriter, r *http.Request) {
 		if !hx.IsHtmx(r) {

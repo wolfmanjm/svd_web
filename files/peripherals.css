@@ -1,0 +1,60 @@
+	.peripherals {
+		height: calc(100vh - 300px);
+		overflow-y: auto;
+	}
+
+	.peripheral {
+			margin-bottom: 20px;
+			border: 1px solid #e2e8f0;
+			border-radius: 8px;
+			transition: box-shadow 0.3s;
+	}
+
+	.peripheral:hover {
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	}
+
+	.peripheral-header {
+			background: #edf2f7;
+			padding: 15px 20px;
+			cursor: pointer;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			user-select: none;
+	}
+
+	.peripheral-header:hover {
+			background: #e2e8f0;
+	}
+
+	.peripheral-name {
+			font-weight: 600;
+			font-size: 1.1em;
+			color: #2d3748;
+	}
+
+	.peripheral-address {
+			color: #718096;
+			font-family: 'Courier New', monospace;
+			font-weight: bold;
+			font-size: 1.0em;
+	}
+
+	.peripheral-description {
+			color: #718096;
+			font-family: 'Courier New';
+			font-size: 0.9em;
+			white-space: pre-line;
+	}
+
+	.toggle-icon {
+			color: #667eea;
+			font-weight: bold;
+			transition: transform 0.3s;
+	}
+
+	.peripheral.active .toggle-icon {
+			transform: rotate(180deg);
+	}
+

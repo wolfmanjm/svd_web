@@ -1,0 +1,47 @@
+.registers {
+		height: calc(100vh - 380px);
+		padding: 20px;
+		background: white;
+		overflow-y: auto;
+}
+
+.peripheral.active .registers {
+		display: block;
+}
+
+.register {
+		padding: 12px;
+		border-left: 3px solid #667eea;
+		background: #f7fafc;
+		margin-bottom: 10px;
+		border-radius: 4px;
+		transition: box-shadow 0.3s;
+}
+.register:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.register-name {
+		font-weight: 600;
+		color: #2d3748;
+		font-family: 'Courier New', monospace;
+}
+
+.register-offset {
+		color: #718096;
+		font-size: 0.85em;
+		margin-left: 10px;
+}
+
+.register-desc {
+		color: #4a5568;
+		font-size: 0.9em;
+		margin-top: 5px;
+		white-space: pre-line;
+}
+
+.no-results {
+		text-align: center;
+		padding: 40px;
+		color: #718096;
+}

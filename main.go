@@ -1,12 +1,17 @@
 package main
 
 import (
-	"os"
+	"embed"
 	"fmt"
+	"os"
+
 	add_svd "github.com/wolfmanjm/svd_web/cmd/add-svd"
-	svd_server "github.com/wolfmanjm/svd_web/cmd/svd_server"
+	"github.com/wolfmanjm/svd_web/cmd/svd_server"
 	test_svd "github.com/wolfmanjm/svd_web/cmd/test_svd"
 )
+
+//go:embed files/*
+var staticFiles embed.FS
 
 func main() {
 	if len(os.Args) < 2 {
@@ -41,7 +46,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	err := svd_server.Server(url)
+	err := svd_server.Server(url, staticFiles)
 	if err != nil {
 		panic(err)
 	}
