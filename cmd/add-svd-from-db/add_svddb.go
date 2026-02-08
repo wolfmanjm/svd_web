@@ -1,4 +1,4 @@
-package send_svd
+package add_svd_from_db
 
 import (
 	"context"
@@ -16,7 +16,7 @@ import (
 )
 
 // This transfers the data in the local svd database to the postgresql database
-func AddSVD(url, fn string) error {
+func AddSVDFromDB(url, fn string) error {
 	err := run(url, fn)
 	if err != nil {
 		return err

@@ -11,9 +11,33 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const addEnumeration = `-- name: AddEnumeration :one
+INSERT INTO enumerations (field_id, name, value, description)
+VALUES ($1, $2, $3, $4) RETURNING id
+`
+
+type AddEnumerationParams struct {
+	FieldID     int32
+	Name        string
+	Value       string
+	Description pgtype.Text
+}
+
+func (q *Queries) AddEnumeration(ctx context.Context, arg AddEnumerationParams) (int32, error) {
+	row := q.db.QueryRow(ctx, addEnumeration,
+		arg.FieldID,
+		arg.Name,
+		arg.Value,
+		arg.Description,
+	)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
 const addField = `-- name: AddField :one
-INSERT INTO fields (register_id, name, num_bits, bit_offset, description)
-VALUES ($1, $2, $3, $4, $5) RETURNING id
+INSERT INTO fields (register_id, name, num_bits, bit_offset, access, description)
+VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
 `
 
 type AddFieldParams struct {
@@ -21,6 +45,7 @@ type AddFieldParams struct {
 	Name        string
 	NumBits     int32
 	BitOffset   int32
+	Access      pgtype.Text
 	Description pgtype.Text
 }
 
@@ -30,6 +55,7 @@ func (q *Queries) AddField(ctx context.Context, arg AddFieldParams) (int32, erro
 		arg.Name,
 		arg.NumBits,
 		arg.BitOffset,
+		arg.Access,
 		arg.Description,
 	)
 	var id int32
@@ -81,8 +107,8 @@ func (q *Queries) AddPeripheral(ctx context.Context, arg AddPeripheralParams) (i
 }
 
 const addRegister = `-- name: AddRegister :one
-INSERT INTO registers (peripheral_id, name, address_offset, reset_value, description)
-VALUES ($1, $2, $3, $4, $5) RETURNING id
+INSERT INTO registers (peripheral_id, name, address_offset, reset_value, access, description)
+VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
 `
 
 type AddRegisterParams struct {
@@ -90,6 +116,7 @@ type AddRegisterParams struct {
 	Name          string
 	AddressOffset string
 	ResetValue    pgtype.Text
+	Access        pgtype.Text
 	Description   pgtype.Text
 }
 
@@ -99,6 +126,7 @@ func (q *Queries) AddRegister(ctx context.Context, arg AddRegisterParams) (int32
 		arg.Name,
 		arg.AddressOffset,
 		arg.ResetValue,
+		arg.Access,
 		arg.Description,
 	)
 	var id int32

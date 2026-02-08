@@ -7,9 +7,13 @@ INSERT INTO peripherals (mpu_id, name, derived_from_id, base_address, descriptio
 VALUES ($1, $2, $3, $4, $5) RETURNING id;
 
 -- name: AddRegister :one
-INSERT INTO registers (peripheral_id, name, address_offset, reset_value, description)
-VALUES ($1, $2, $3, $4, $5) RETURNING id;
+INSERT INTO registers (peripheral_id, name, address_offset, reset_value, access, description)
+VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;
 
 -- name: AddField :one
-INSERT INTO fields (register_id, name, num_bits, bit_offset, description)
-VALUES ($1, $2, $3, $4, $5) RETURNING id;
+INSERT INTO fields (register_id, name, num_bits, bit_offset, access, description)
+VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;
+
+-- name: AddEnumeration :one
+INSERT INTO enumerations (field_id, name, value, description)
+VALUES ($1, $2, $3, $4) RETURNING id;

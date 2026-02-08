@@ -8,6 +8,14 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Enumeration struct {
+	ID          int32
+	FieldID     int32
+	Name        string
+	Value       string
+	Description pgtype.Text
+}
+
 type Field struct {
 	ID          int32
 	RegisterID  int32
@@ -15,6 +23,7 @@ type Field struct {
 	NumBits     int32
 	BitOffset   int32
 	Description pgtype.Text
+	Access      pgtype.Text
 }
 
 type Mpu struct {
@@ -39,4 +48,5 @@ type Register struct {
 	AddressOffset string
 	ResetValue    pgtype.Text
 	Description   pgtype.Text
+	Access        pgtype.Text
 }

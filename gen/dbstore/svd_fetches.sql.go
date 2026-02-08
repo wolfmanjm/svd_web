@@ -10,7 +10,7 @@ import (
 )
 
 const fetchFields = `-- name: FetchFields :many
-SELECT id, register_id, name, num_bits, bit_offset, description
+SELECT id, register_id, name, num_bits, bit_offset, description, access
 FROM fields WHERE register_id = $1
 ORDER BY bit_offset
 `
@@ -31,6 +31,7 @@ func (q *Queries) FetchFields(ctx context.Context, registerID int32) ([]Field, e
 			&i.NumBits,
 			&i.BitOffset,
 			&i.Description,
+			&i.Access,
 		); err != nil {
 			return nil, err
 		}
@@ -76,7 +77,7 @@ func (q *Queries) FetchPeripherals(ctx context.Context, mpuID int32) ([]Peripher
 }
 
 const fetchRegisters = `-- name: FetchRegisters :many
-SELECT id, peripheral_id, name, address_offset, reset_value, description
+SELECT id, peripheral_id, name, address_offset, reset_value, description, access
 FROM registers WHERE peripheral_id = $1
 ORDER BY name
 `
@@ -97,6 +98,7 @@ func (q *Queries) FetchRegisters(ctx context.Context, peripheralID int32) ([]Reg
 			&i.AddressOffset,
 			&i.ResetValue,
 			&i.Description,
+			&i.Access,
 		); err != nil {
 			return nil, err
 		}
@@ -186,7 +188,7 @@ func (q *Queries) FindPeripherals(ctx context.Context, arg FindPeripheralsParams
 }
 
 const findRegister = `-- name: FindRegister :one
-SELECT id, peripheral_id, name, address_offset, reset_value, description
+SELECT id, peripheral_id, name, address_offset, reset_value, description, access
 FROM registers
 WHERE peripheral_id = $1 AND lower(name) LIKE lower($2::text)
 `
@@ -206,12 +208,13 @@ func (q *Queries) FindRegister(ctx context.Context, arg FindRegisterParams) (Reg
 		&i.AddressOffset,
 		&i.ResetValue,
 		&i.Description,
+		&i.Access,
 	)
 	return i, err
 }
 
 const findRegisters = `-- name: FindRegisters :many
-SELECT id, peripheral_id, name, address_offset, reset_value, description
+SELECT id, peripheral_id, name, address_offset, reset_value, description, access
 FROM registers
 WHERE peripheral_id = $1 AND lower(name) LIKE lower($2::text)
 ORDER BY name
@@ -238,6 +241,7 @@ func (q *Queries) FindRegisters(ctx context.Context, arg FindRegistersParams) ([
 			&i.AddressOffset,
 			&i.ResetValue,
 			&i.Description,
+			&i.Access,
 		); err != nil {
 			return nil, err
 		}
@@ -283,7 +287,7 @@ func (q *Queries) GetPeripheral(ctx context.Context, id int32) (Peripheral, erro
 }
 
 const getRegister = `-- name: GetRegister :one
-SELECT id, peripheral_id, name, address_offset, reset_value, description
+SELECT id, peripheral_id, name, address_offset, reset_value, description, access
 FROM registers
 WHERE id = $1
 `
@@ -298,6 +302,7 @@ func (q *Queries) GetRegister(ctx context.Context, id int32) (Register, error) {
 		&i.AddressOffset,
 		&i.ResetValue,
 		&i.Description,
+		&i.Access,
 	)
 	return i, err
 }
