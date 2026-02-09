@@ -220,6 +220,92 @@ func FieldAccessFrag(r dbstore.Register, f dbstore.Field) goht.Template {
 	})
 }
 
+func FieldEnumsFrag(db *database.Database, id int32) goht.Template {
+	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
+		__buf, __isBuf := __w.(goht.Buffer)
+		if !__isBuf {
+			__buf = goht.GetBuffer()
+			defer goht.ReleaseBuffer(__buf)
+		}
+		var __children goht.Template
+		ctx, __children = goht.PopChildren(ctx)
+		_ = __children
+		if _, __err = __buf.WriteString("<!--Enumerations-->\n"); __err != nil {
+			return
+		}
+		el, _ := db.GetEnums(id)
+		if len(el) > 0 {
+			if _, __err = __buf.WriteString("<div class=\"field-enums\">\n"); __err != nil {
+				return
+			}
+			for _, e := range el {
+				if _, __err = __buf.WriteString("<div class=\"enum-item\">\n<div class=\"enum-value\">"); __err != nil {
+					return
+				}
+				var __var1 string
+				if __var1, __err = goht.CaptureErrors(goht.EscapeString(e.Value)); __err != nil {
+					return
+				}
+				if _, __err = __buf.WriteString(__var1); __err != nil {
+					return
+				}
+				if _, __err = __buf.WriteString("</div>\n"); __err != nil {
+					return
+				}
+				if e.Description.Valid {
+					if _, __err = __buf.WriteString("<div class=\"enum-desc\">\n"); __err != nil {
+						return
+					}
+					var __var2 string
+					if __var2, __err = goht.CaptureErrors(goht.EscapeString(e.Name)); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(__var2); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString("\n"); __err != nil {
+						return
+					}
+					var __var3 string
+					if __var3, __err = goht.CaptureErrors(goht.EscapeString(e.Description.String)); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(__var3); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString("\n</div>\n"); __err != nil {
+						return
+					}
+				} else {
+					if _, __err = __buf.WriteString("<div class=\"enum-desc\">"); __err != nil {
+						return
+					}
+					var __var4 string
+					if __var4, __err = goht.CaptureErrors(goht.EscapeString(e.Name)); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString(__var4); __err != nil {
+						return
+					}
+					if _, __err = __buf.WriteString("</div>\n"); __err != nil {
+						return
+					}
+				}
+				if _, __err = __buf.WriteString("</div>\n"); __err != nil {
+					return
+				}
+			}
+			if _, __err = __buf.WriteString("</div>\n"); __err != nil {
+				return
+			}
+		}
+		if !__isBuf {
+			_, __err = __w.Write(__buf.Bytes())
+		}
+		return
+	})
+}
+
 func generateTable(fields []dbstore.Field) goht.Template {
 	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
 		__buf, __isBuf := __w.(goht.Buffer)
@@ -339,6 +425,9 @@ func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
 				return
 			}
 			if _, __err = __buf.WriteString("</div>\n</div>\n"); __err != nil {
+				return
+			}
+			if __err = FieldEnumsFrag(db, f.ID).Render(ctx, __buf); __err != nil {
 				return
 			}
 			if f.Description.Valid {

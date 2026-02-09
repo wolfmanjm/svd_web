@@ -9,6 +9,38 @@ import (
 	"context"
 )
 
+const fetchEnums = `-- name: FetchEnums :many
+SELECT id, field_id, name, value, description
+FROM enumerations WHERE field_id = $1
+ORDER BY value
+`
+
+func (q *Queries) FetchEnums(ctx context.Context, fieldID int32) ([]Enumeration, error) {
+	rows, err := q.db.Query(ctx, fetchEnums, fieldID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Enumeration
+	for rows.Next() {
+		var i Enumeration
+		if err := rows.Scan(
+			&i.ID,
+			&i.FieldID,
+			&i.Name,
+			&i.Value,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const fetchFields = `-- name: FetchFields :many
 SELECT id, register_id, name, num_bits, bit_offset, description, access
 FROM fields WHERE register_id = $1

@@ -117,12 +117,20 @@ func (db *Database) FindRegisters(id int32, pat string) ([]dbstore.Register, err
 
 // Get fields for the specified register
 func (db *Database) GetFields(rid int32) ([]dbstore.Field, error) {
-
 	fields, err := db.queries.FetchFields(db.ctx, rid)
 	if err != nil {
 		return fields, fmt.Errorf("fetch Fields - %w", err)
 	}
 	return fields, nil
+}
+
+// Get enums for the specified field
+func (db *Database) GetEnums(fid int32) ([]dbstore.Enumeration, error) {
+	enums, err := db.queries.FetchEnums(db.ctx, fid)
+	if err != nil {
+		return enums, fmt.Errorf("fetch Enums - %w", err)
+	}
+	return enums, nil
 }
 
 func (db *Database) DoStuff() error {

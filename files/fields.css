@@ -126,3 +126,38 @@
 		font-size: 0.75em;
 }
 
+.field-enums {
+    margin-top: 8px;
+    padding-left: 0;
+}
+
+.enum-item {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 10px;
+    padding: 6px 10px;
+    background: #f7fafc;
+   	margin-left: 80px;
+    border-left: 3px solid #cbd5e0;
+    margin-bottom: 4px;
+    font-size: 0.85em;
+}
+
+.enum-item:hover {
+    background: #edf2f7;
+    border-left-color: #667eea;
+}
+
+.enum-value {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.enum-desc {
+    color: #4a5568;
+}
+
+.field-with-enums {
+    padding-bottom: 5px;
+}

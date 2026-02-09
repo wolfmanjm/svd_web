@@ -58,6 +58,23 @@ func displayBits(numbits, offset int32) string {
 		%span.field-access.wo WO
 }
 
+@haml FieldEnumsFrag(db *database.Database, id int32) {
+	/ Enumerations
+	- el, _ := db.GetEnums(id)
+	- if len(el) > 0
+		.field-enums
+			- for _, e := range el
+				.enum-item
+					.enum-value= e.Value
+					- if e.Description.Valid
+						.enum-desc
+							= e.Name
+							= e.Description.String
+					- else
+						.enum-desc= e.Name
+
+}
+
 @haml generateTable(fields []dbstore.Field) {
 	- bnums, bnames := helpers.GenerateFieldDiagram(fields)
 
@@ -96,6 +113,7 @@ func displayBits(numbits, offset int32) string {
 					.field-name
 						= f.Name
 						= @render FieldAccessFrag(r, f)
+				= @render FieldEnumsFrag(db, f.ID)
 				- if f.Description.Valid
 					.field-desc #{f.Description.String}
 

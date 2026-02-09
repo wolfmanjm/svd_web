@@ -60,4 +60,9 @@ SELECT *
 FROM fields WHERE register_id = $1
 ORDER BY bit_offset;
 
+-- name: FetchEnums :many
+SELECT *
+FROM enumerations WHERE field_id = $1
+ORDER BY value;
+
 
