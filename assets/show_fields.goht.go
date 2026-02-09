@@ -180,6 +180,55 @@ func FieldNamesFrag(bs []helpers.BitField) goht.Template {
 	})
 }
 
+func FieldAccessFrag(r dbstore.Register, f dbstore.Field) goht.Template {
+	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
+		__buf, __isBuf := __w.(goht.Buffer)
+		if !__isBuf {
+			__buf = goht.GetBuffer()
+			defer goht.ReleaseBuffer(__buf)
+		}
+		var __children goht.Template
+		ctx, __children = goht.PopChildren(ctx)
+		_ = __children
+		if _, __err = __buf.WriteString("<!--Field Access-->\n"); __err != nil {
+			return
+		}
+		if r.Access.Valid {
+			if r.Access.String == "read-write" {
+				if _, __err = __buf.WriteString("<span class=\"field-access\">RW</span>\n"); __err != nil {
+					return
+				}
+			} else if r.Access.String == "read-only" {
+				if _, __err = __buf.WriteString("<span class=\"field-access ro\">RO</span>\n"); __err != nil {
+					return
+				}
+			} else if r.Access.String == "write-only" {
+				if _, __err = __buf.WriteString("<span class=\"field-access wo\">WO</span>\n"); __err != nil {
+					return
+				}
+			}
+		} else if f.Access.Valid {
+			if f.Access.String == "read-write" {
+				if _, __err = __buf.WriteString("<span class=\"field-access\">RW</span>\n"); __err != nil {
+					return
+				}
+			} else if f.Access.String == "read-only" {
+				if _, __err = __buf.WriteString("<span class=\"field-access ro\">RO</span>\n"); __err != nil {
+					return
+				}
+			} else if f.Access.String == "write-only" {
+				if _, __err = __buf.WriteString("<span class=\"field-access wo\">WO</span>\n"); __err != nil {
+					return
+				}
+			}
+		}
+		if !__isBuf {
+			_, __err = __w.Write(__buf.Bytes())
+		}
+		return
+	})
+}
+
 func generateTable(fields []dbstore.Field) goht.Template {
 	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
 		__buf, __isBuf := __w.(goht.Buffer)
@@ -282,7 +331,7 @@ func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
 			if _, __err = __buf.WriteString(__var4); __err != nil {
 				return
 			}
-			if _, __err = __buf.WriteString("</div>\n<div class=\"field-name\">"); __err != nil {
+			if _, __err = __buf.WriteString("</div>\n<div class=\"field-name\">\n"); __err != nil {
 				return
 			}
 			var __var5 string
@@ -290,6 +339,12 @@ func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
 				return
 			}
 			if _, __err = __buf.WriteString(__var5); __err != nil {
+				return
+			}
+			if _, __err = __buf.WriteString("\n"); __err != nil {
+				return
+			}
+			if __err = FieldAccessFrag(r, f).Render(ctx, __buf); __err != nil {
 				return
 			}
 			if _, __err = __buf.WriteString("</div>\n</div>\n"); __err != nil {

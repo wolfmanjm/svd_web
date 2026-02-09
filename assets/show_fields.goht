@@ -41,6 +41,25 @@ func displayBits(numbits, offset int32) string {
 					%td.rw= b.Value
 }
 
+@haml FieldAccessFrag(r dbstore.Register, f dbstore.Field) {
+	/ Field Access
+	- if r.Access.Valid
+		- if r.Access.String == "read-write"
+			%span.field-access RW
+		- else if r.Access.String == "read-only"
+			%span.field-access.ro RO
+		- else if r.Access.String == "write-only"
+			%span.field-access.wo WO
+
+	- else if f.Access.Valid
+		- if f.Access.String == "read-write"
+			%span.field-access RW
+		- else if f.Access.String == "read-only"
+			%span.field-access.ro RO
+		- else if f.Access.String == "write-only"
+			%span.field-access.wo WO
+}
+
 @haml generateTable(fields []dbstore.Field) {
 	- bnums, bnames := helpers.GenerateFieldDiagram(fields)
 
@@ -76,7 +95,9 @@ func displayBits(numbits, offset int32) string {
 			- for _, f := range fields
 				.field
 					.field-bits= displayBits(f.NumBits, f.BitOffset)
-					.field-name #{f.Name}
+					.field-name
+						= f.Name
+						= @render FieldAccessFrag(r, f)
 				- if f.Description.Valid
 					.field-desc #{f.Description.String}
 
