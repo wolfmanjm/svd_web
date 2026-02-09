@@ -193,33 +193,24 @@ func FieldAccessFrag(r dbstore.Register, f dbstore.Field) goht.Template {
 		if _, __err = __buf.WriteString("<!--Field Access-->\n"); __err != nil {
 			return
 		}
+		var access string
 		if r.Access.Valid {
-			if r.Access.String == "read-write" {
-				if _, __err = __buf.WriteString("<span class=\"field-access\">RW</span>\n"); __err != nil {
-					return
-				}
-			} else if r.Access.String == "read-only" {
-				if _, __err = __buf.WriteString("<span class=\"field-access ro\">RO</span>\n"); __err != nil {
-					return
-				}
-			} else if r.Access.String == "write-only" {
-				if _, __err = __buf.WriteString("<span class=\"field-access wo\">WO</span>\n"); __err != nil {
-					return
-				}
-			}
+			access = r.Access.String
 		} else if f.Access.Valid {
-			if f.Access.String == "read-write" {
-				if _, __err = __buf.WriteString("<span class=\"field-access\">RW</span>\n"); __err != nil {
-					return
-				}
-			} else if f.Access.String == "read-only" {
-				if _, __err = __buf.WriteString("<span class=\"field-access ro\">RO</span>\n"); __err != nil {
-					return
-				}
-			} else if f.Access.String == "write-only" {
-				if _, __err = __buf.WriteString("<span class=\"field-access wo\">WO</span>\n"); __err != nil {
-					return
-				}
+			access = f.Access.String
+		}
+		switch access {
+		case "read-write":
+			if _, __err = __buf.WriteString("<span class=\"field-access\">RW</span>\n"); __err != nil {
+				return
+			}
+		case "read-only":
+			if _, __err = __buf.WriteString("<span class=\"field-access ro\">RO</span>\n"); __err != nil {
+				return
+			}
+		case "write-only":
+			if _, __err = __buf.WriteString("<span class=\"field-access wo\">WO</span>\n"); __err != nil {
+				return
 			}
 		}
 		if !__isBuf {

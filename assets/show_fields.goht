@@ -43,21 +43,19 @@ func displayBits(numbits, offset int32) string {
 
 @haml FieldAccessFrag(r dbstore.Register, f dbstore.Field) {
 	/ Field Access
+	- var access string
 	- if r.Access.Valid
-		- if r.Access.String == "read-write"
-			%span.field-access RW
-		- else if r.Access.String == "read-only"
-			%span.field-access.ro RO
-		- else if r.Access.String == "write-only"
-			%span.field-access.wo WO
-
+		- access = r.Access.String
 	- else if f.Access.Valid
-		- if f.Access.String == "read-write"
-			%span.field-access RW
-		- else if f.Access.String == "read-only"
-			%span.field-access.ro RO
-		- else if f.Access.String == "write-only"
-			%span.field-access.wo WO
+		- access = f.Access.String
+
+	- switch access
+		- case "read-write":
+		%span.field-access RW
+		- case "read-only":
+		%span.field-access.ro RO
+		- case "write-only":
+		%span.field-access.wo WO
 }
 
 @haml generateTable(fields []dbstore.Field) {
