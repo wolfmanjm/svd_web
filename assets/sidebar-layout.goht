@@ -206,7 +206,11 @@ func firstLine(str string) string {
 						%p.subtitle Reference Guide for Various Microcontrollers
 					.empty-state
 						%h2 Welcome!
+						%p This database is generated from the Vendor supplied SVD files for the MCUs listed
 						%p Select a MCU from the sidebar to see the Peripherals
+						%p Click on the peripheral you want to see the registers for
+						%p Click the register you want to see the fields for
+
 
 
 		:javascript
