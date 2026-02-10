@@ -18,26 +18,22 @@ migrate/fresh: 		## Create a fresh database
 sql:			## Generate the sqlc helpers
 	sqlc generate
 
-build-rpi:
-	OOS=linux GOARCH=arm64 go build -o svd_web-rpi
+build-rpi:		## build for rpi
+	OOS=linux GOARCH=arm64 go build -o svd_web_rpi
 
-build:
+build:			## build
 	go build -o svd_web
 
 add_svds:		## Add all the known SVDs to the database
-	go run main.go add ../svd_lookup/data/STM32H745_CM7-svd.db
-	go run main.go add ../svd_lookup/data/RP2040-svd.db
-	go run main.go add ../svd_lookup/data/rp2350-svd.db
-	go run main.go add ../svd_lookup/data/lpc1768-svd.db
 
-add:			## Add a SVD to the database name=xxx
+add:			## Add a SVD to the database name=path-to-svd
 	@if [ -z "${name}" ] ; then echo "Need name"; exit 1; fi;
-	go run main.go add ../svd_lookup/data/${name}
+	go run main.go add-svd ${name}
 
-serve: assets		## Run the server
+serve: assets		## Run the server, builds assets first
 	go run main.go serve
 
-check:              ## do a static check on the entore project
+check:              	## do a static check on the entore project
 	staticcheck ./...
 
 help:           	## Show this help.

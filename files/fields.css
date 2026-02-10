@@ -7,6 +7,14 @@
 		letter-spacing: 0.5px;
 }
 
+.register-fields {
+		margin-top: 15px;
+		padding: 15px;
+		background: white;
+		border: 1px solid #e2e8f0;
+		border-radius: 6px;
+}
+
 .fields {
 	height: calc(100vh - 400px);
 	overflow-y: auto;
@@ -39,7 +47,7 @@
 	color: #4a5568;
 	font-size: 0.85em;
 	margin-left: 80px;
-	white-space: pre-line;
+	white-space: normal;
 }
 
 .field-access {

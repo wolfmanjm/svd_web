@@ -174,14 +174,6 @@ func firstLine(str string) string {
 				}
 
 
-				.register-fields {
-						margin-top: 15px;
-						padding: 15px;
-						background: white;
-						border: 1px solid #e2e8f0;
-						border-radius: 6px;
-				}
-
 		%body
 			.container
 				/ Left Sidebar
