@@ -11,7 +11,7 @@ import (
 	"github.com/wolfmanjm/svd_web/internal/database"
 )
 
-func Server(cstr string, staticFiles embed.FS) error {
+func Server(cstr string, staticFiles embed.FS, port int) error {
 	db, err := database.Setup(cstr)
 	if err != nil {
 		return fmt.Errorf("database setup - %w", err)
@@ -132,9 +132,9 @@ func Server(cstr string, staticFiles embed.FS) error {
 	// 	fmt.Println(r)
 	// })
 
-
-	fmt.Println("Server starting on port 8080...")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	portstr := fmt.Sprintf(":%d", port)
+	fmt.Println("Server starting on port: ", portstr)
+	if err := http.ListenAndServe(portstr, mux); err != nil {
 		return err
 	}
 	return nil
