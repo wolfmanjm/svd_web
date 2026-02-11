@@ -11,9 +11,10 @@ type BitField struct {
 	Colspan int32
 	Value string
 	Reserved bool
+	Access string
 }
 
-func GenerateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
+func GenerateFieldDiagram(fields []dbstore.Field, access string) ([]BitField, []BitField) {
 	// convert into a map
 	fmap := make(map[int32]dbstore.Field, len(fields))
 	for _, f := range fields {
@@ -68,6 +69,14 @@ func GenerateFieldDiagram(fields []dbstore.Field) ([]BitField, []BitField) {
 		b.Colspan = colspans[i]
 		b.Value = f.Name
 		b.Reserved = !ok
+		b.Access = "read-write"
+
+		if access != "" {
+			b.Access = access
+		} else if f.Access.Valid {
+			b.Access = f.Access.String
+		}
+
 		if colspans[i] > 1 {
 			if !ok {
 				b.Value = "Reserved"

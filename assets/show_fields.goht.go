@@ -118,24 +118,67 @@ func FieldNamesFrag(bs []helpers.BitField) goht.Template {
 						return
 					}
 				} else {
-					if _, __err = __buf.WriteString("<td class=\"rw\" colspan=\""); __err != nil {
-						return
-					}
-					if _, __err = __buf.WriteString(goht.EscapeString(goht.FormatString("%d", b.Colspan)) + "\""); __err != nil {
-						return
-					}
-					if _, __err = __buf.WriteString(">"); __err != nil {
-						return
-					}
-					var __var2 string
-					if __var2, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
-						return
-					}
-					if _, __err = __buf.WriteString(__var2); __err != nil {
-						return
-					}
-					if _, __err = __buf.WriteString("</td>\n"); __err != nil {
-						return
+					switch b.Access {
+					case "read-write":
+						if _, __err = __buf.WriteString("<td class=\"rw\" colspan=\""); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(goht.EscapeString(goht.FormatString("%d", b.Colspan)) + "\""); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(">"); __err != nil {
+							return
+						}
+						var __var2 string
+						if __var2, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(__var2); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+							return
+						}
+					case "read-only":
+						if _, __err = __buf.WriteString("<td class=\"ro\" colspan=\""); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(goht.EscapeString(goht.FormatString("%d", b.Colspan)) + "\""); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(">"); __err != nil {
+							return
+						}
+						var __var3 string
+						if __var3, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(__var3); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+							return
+						}
+					case "write-only":
+						if _, __err = __buf.WriteString("<td class=\"wo\" colspan=\""); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(goht.EscapeString(goht.FormatString("%d", b.Colspan)) + "\""); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(">"); __err != nil {
+							return
+						}
+						var __var4 string
+						if __var4, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(__var4); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+							return
+						}
 					}
 				}
 			} else {
@@ -143,29 +186,60 @@ func FieldNamesFrag(bs []helpers.BitField) goht.Template {
 					if _, __err = __buf.WriteString("<td class=\"reserved\">"); __err != nil {
 						return
 					}
-					var __var3 string
-					if __var3, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+					var __var5 string
+					if __var5, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
 						return
 					}
-					if _, __err = __buf.WriteString(__var3); __err != nil {
+					if _, __err = __buf.WriteString(__var5); __err != nil {
 						return
 					}
 					if _, __err = __buf.WriteString("</td>\n"); __err != nil {
 						return
 					}
 				} else {
-					if _, __err = __buf.WriteString("<td class=\"rw\">"); __err != nil {
-						return
-					}
-					var __var4 string
-					if __var4, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
-						return
-					}
-					if _, __err = __buf.WriteString(__var4); __err != nil {
-						return
-					}
-					if _, __err = __buf.WriteString("</td>\n"); __err != nil {
-						return
+					switch b.Access {
+					case "read-write":
+						if _, __err = __buf.WriteString("<td class=\"rw\">"); __err != nil {
+							return
+						}
+						var __var6 string
+						if __var6, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(__var6); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+							return
+						}
+					case "read-only":
+						if _, __err = __buf.WriteString("<td class=\"ro\">"); __err != nil {
+							return
+						}
+						var __var7 string
+						if __var7, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(__var7); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+							return
+						}
+					case "write-only":
+						if _, __err = __buf.WriteString("<td class=\"wo\">"); __err != nil {
+							return
+						}
+						var __var8 string
+						if __var8, __err = goht.CaptureErrors(goht.EscapeString(b.Value)); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString(__var8); __err != nil {
+							return
+						}
+						if _, __err = __buf.WriteString("</td>\n"); __err != nil {
+							return
+						}
 					}
 				}
 			}
@@ -306,7 +380,7 @@ func FieldEnumsFrag(db *database.Database, id int32) goht.Template {
 	})
 }
 
-func generateTable(fields []dbstore.Field) goht.Template {
+func generateTable(fields []dbstore.Field, r dbstore.Register) goht.Template {
 	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
 		__buf, __isBuf := __w.(goht.Buffer)
 		if !__isBuf {
@@ -316,7 +390,7 @@ func generateTable(fields []dbstore.Field) goht.Template {
 		var __children goht.Template
 		ctx, __children = goht.PopChildren(ctx)
 		_ = __children
-		bnums, bnames := helpers.GenerateFieldDiagram(fields)
+		bnums, bnames := helpers.GenerateFieldDiagram(fields, r.Access.String)
 		if _, __err = __buf.WriteString("<!--Bit numbers-->\n<tr class=\"bit-numbers\">\n"); __err != nil {
 			return
 		}
@@ -391,7 +465,7 @@ func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
 		if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\">&#8678; Back to Registers</link_to>\n<div class=\"register-diagram\">\n<table class=\"bit-field-table\">\n"); __err != nil {
 			return
 		}
-		if __err = generateTable(fields).Render(ctx, __buf); __err != nil {
+		if __err = generateTable(fields, r).Render(ctx, __buf); __err != nil {
 			return
 		}
 		if _, __err = __buf.WriteString("</table>\n</div>\n<div class=\"fields\">\n<div class=\"register-fields\">\n"); __err != nil {

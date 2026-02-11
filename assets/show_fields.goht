@@ -33,12 +33,25 @@ func displayBits(numbits, offset int32) string {
 				- if b.Reserved
 					%td.reserved{colspan: #{%d b.Colspan} }= b.Value
 				- else
-					%td.rw{colspan: #{%d b.Colspan} }= b.Value
+					- switch b.Access
+						- case "read-write":
+						%td.rw{colspan: #{%d b.Colspan} }= b.Value
+						- case "read-only":
+						%td.ro{colspan: #{%d b.Colspan} }= b.Value
+						- case "write-only":
+						%td.wo{colspan: #{%d b.Colspan} }= b.Value
 			- else
 				- if b.Reserved
 					%td.reserved= b.Value
 				- else
-					%td.rw= b.Value
+					- switch b.Access
+						- case "read-write":
+						%td.rw= b.Value
+						- case "read-only":
+						%td.ro= b.Value
+						- case "write-only":
+						%td.wo= b.Value
+
 }
 
 @haml FieldAccessFrag(r dbstore.Register, f dbstore.Field) {
@@ -75,8 +88,8 @@ func displayBits(numbits, offset int32) string {
 
 }
 
-@haml generateTable(fields []dbstore.Field) {
-	- bnums, bnames := helpers.GenerateFieldDiagram(fields)
+@haml generateTable(fields []dbstore.Field, r dbstore.Register) {
+	- bnums, bnames := helpers.GenerateFieldDiagram(fields, r.Access.String)
 
 	/ Bit numbers
 	%tr.bit-numbers
@@ -103,7 +116,7 @@ func displayBits(numbits, offset int32) string {
 
 	.register-diagram
 		%table.bit-field-table
-			= @render generateTable(fields)
+			= @render generateTable(fields, r)
 
 	.fields
 		.register-fields
