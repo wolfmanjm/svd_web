@@ -131,3 +131,21 @@ func displayBits(numbits, offset int32) string {
 					.field-desc #{f.Description.String}
 
 }
+
+@haml ShowNoFields(db *database.Database, id int) {
+	- r := db.GetRegister(int32(id))
+	- p := db.GetPeripheral(r.PeripheralID)
+	- m := db.GetMpu(p.MpuID)
+	%header
+		%h1 Bit Fields for #{r.Name} of #{p.Name}
+		%p.subtitle Reference Guide for #{m.Name}
+
+	%link_to.backto-item{
+	"hx-get": #{fmt.Sprintf("/registers/%d", p.ID)},
+	"hx-swap": "innerHTML",
+	"hx-target": "#contentArea.content"
+	} &#8678; Back to Registers
+
+	.fields
+		No Fields documented for this register
+}

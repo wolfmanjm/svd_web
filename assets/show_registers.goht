@@ -41,3 +41,31 @@ import (
 					%br
 					%span.register-desc #{r.Description.String}
 }
+
+@haml ShowNoRegisters(db *database.Database, pid int) {
+	%header
+		- p := db.GetPeripheral(int32(pid))
+		- m := db.GetMpu(p.MpuID)
+		%h1 Registers for #{p.Name}
+		%p.subtitle Reference Guide for #{m.Name}
+	.search-bar
+		%input#searchInput{
+		name: "pattern",
+		placeholder: "Filter registers...",
+		type: "search",
+		"hx-get": #{fmt.Sprintf("/findregisters/%d", p.ID)},
+		"hx-target": ".registers",
+		"hx-select": ".registers",
+		"hx-swap": "outerHTML",
+		"hx-include": "[name='pattern']"
+		}
+
+	%link_to.backto-item{
+	"hx-get": #{fmt.Sprintf("/peripherals/%d", m.ID)},
+	"hx-swap": "innerHTML scroll:top",
+	"hx-target": "#contentArea.content"
+	} &#8678; Back to Peripherals
+
+	.registers
+		No Registers Match
+}

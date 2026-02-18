@@ -136,3 +136,60 @@ func ShowRegisters(db *database.Database, regs []dbstore.Register) goht.Template
 		return
 	})
 }
+
+func ShowNoRegisters(db *database.Database, pid int) goht.Template {
+	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
+		__buf, __isBuf := __w.(goht.Buffer)
+		if !__isBuf {
+			__buf = goht.GetBuffer()
+			defer goht.ReleaseBuffer(__buf)
+		}
+		var __children goht.Template
+		ctx, __children = goht.PopChildren(ctx)
+		_ = __children
+		if _, __err = __buf.WriteString("<header>\n"); __err != nil {
+			return
+		}
+		p := db.GetPeripheral(int32(pid))
+		m := db.GetMpu(p.MpuID)
+		if _, __err = __buf.WriteString("<h1>Registers for "); __err != nil {
+			return
+		}
+		var __var1 string
+		if __var1, __err = goht.CaptureErrors(goht.EscapeString(p.Name)); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(__var1); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString("</h1>\n<p class=\"subtitle\">Reference Guide for "); __err != nil {
+			return
+		}
+		var __var2 string
+		if __var2, __err = goht.CaptureErrors(goht.EscapeString(m.Name)); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(__var2); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString("</p>\n</header>\n<div class=\"search-bar\">\n<input id=\"searchInput\" name=\"pattern\" placeholder=\"Filter registers...\" type=\"search\" hx-get=\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/findregisters/%d", p.ID)) + "\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(" hx-target=\".registers\" hx-select=\".registers\" hx-swap=\"outerHTML\" hx-include=\"[name=&#39;pattern&#39;]\"></div>\n<link_to class=\"backto-item\" hx-get=\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/peripherals/%d", m.ID)) + "\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(" hx-swap=\"innerHTML scroll:top\" hx-target=\"#contentArea.content\">&#8678; Back to Peripherals</link_to>\n<div class=\"registers\">\nNo Registers Match\n</div>\n"); __err != nil {
+			return
+		}
+		if !__isBuf {
+			_, __err = __w.Write(__buf.Bytes())
+		}
+		return
+	})
+}

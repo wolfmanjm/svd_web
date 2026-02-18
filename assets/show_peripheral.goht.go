@@ -127,3 +127,43 @@ func ShowPeripherals(db *database.Database, periphs []dbstore.Peripheral) goht.T
 		return
 	})
 }
+
+func ShowNoPeripherals(db *database.Database, mpuID int) goht.Template {
+	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
+		__buf, __isBuf := __w.(goht.Buffer)
+		if !__isBuf {
+			__buf = goht.GetBuffer()
+			defer goht.ReleaseBuffer(__buf)
+		}
+		var __children goht.Template
+		ctx, __children = goht.PopChildren(ctx)
+		_ = __children
+		if _, __err = __buf.WriteString("<header>\n"); __err != nil {
+			return
+		}
+		m := db.GetMpu(int32(mpuID))
+		if _, __err = __buf.WriteString("<h1>Peripherals</h1>\n<p class=\"subtitle\">Reference Guide for "); __err != nil {
+			return
+		}
+		var __var1 string
+		if __var1, __err = goht.CaptureErrors(goht.EscapeString(m.Name)); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(__var1); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString("</p>\n</header>\n<div class=\"search-bar\">\n<input id=\"searchInput\" name=\"pattern\" placeholder=\"Filter peripherals...\" type=\"search\" hx-get=\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/findperipherals/%d", mpuID)) + "\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(" hx-target=\".peripherals\" hx-select=\".peripherals\" hx-swap=\"outerHTML\" hx-include=\"[name=&#39;pattern&#39;]\"></div>\n<div class=\"peripherals\">\nNo Peripherals match\n</div>\n"); __err != nil {
+			return
+		}
+		if !__isBuf {
+			_, __err = __w.Write(__buf.Bytes())
+		}
+		return
+	})
+}

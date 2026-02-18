@@ -529,3 +529,62 @@ func ShowFields(db *database.Database, fields []dbstore.Field) goht.Template {
 		return
 	})
 }
+
+func ShowNoFields(db *database.Database, id int) goht.Template {
+	return goht.TemplateFunc(func(ctx context.Context, __w io.Writer, __sts ...goht.SlottedTemplate) (__err error) {
+		__buf, __isBuf := __w.(goht.Buffer)
+		if !__isBuf {
+			__buf = goht.GetBuffer()
+			defer goht.ReleaseBuffer(__buf)
+		}
+		var __children goht.Template
+		ctx, __children = goht.PopChildren(ctx)
+		_ = __children
+		r := db.GetRegister(int32(id))
+		p := db.GetPeripheral(r.PeripheralID)
+		m := db.GetMpu(p.MpuID)
+		if _, __err = __buf.WriteString("<header>\n<h1>Bit Fields for "); __err != nil {
+			return
+		}
+		var __var1 string
+		if __var1, __err = goht.CaptureErrors(goht.EscapeString(r.Name)); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(__var1); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(" of "); __err != nil {
+			return
+		}
+		var __var2 string
+		if __var2, __err = goht.CaptureErrors(goht.EscapeString(p.Name)); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(__var2); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString("</h1>\n<p class=\"subtitle\">Reference Guide for "); __err != nil {
+			return
+		}
+		var __var3 string
+		if __var3, __err = goht.CaptureErrors(goht.EscapeString(m.Name)); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(__var3); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString("</p>\n</header>\n<link_to class=\"backto-item\" hx-get=\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(goht.EscapeString(fmt.Sprintf("/registers/%d", p.ID)) + "\""); __err != nil {
+			return
+		}
+		if _, __err = __buf.WriteString(" hx-swap=\"innerHTML\" hx-target=\"#contentArea.content\">&#8678; Back to Registers</link_to>\n<div class=\"fields\">\nNo Fields documented for this register\n</div>\n"); __err != nil {
+			return
+		}
+		if !__isBuf {
+			_, __err = __w.Write(__buf.Bytes())
+		}
+		return
+	})
+}

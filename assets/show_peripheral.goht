@@ -42,3 +42,24 @@ import (
 						%br
 						%span.peripheral-description #{p.Description.String}
 }
+
+@haml ShowNoPeripherals(db *database.Database, mpuID int) {
+	%header
+		- m := db.GetMpu(int32(mpuID))
+		%h1 Peripherals
+		%p.subtitle Reference Guide for #{m.Name}
+	.search-bar
+		%input#searchInput{
+		name: "pattern",
+		placeholder: "Filter peripherals...",
+		type: "search",
+		"hx-get": #{fmt.Sprintf("/findperipherals/%d", mpuID)},
+		"hx-target": ".peripherals",
+		"hx-select": ".peripherals",
+		"hx-swap": "outerHTML",
+		"hx-include": "[name='pattern']"
+		}
+
+	.peripherals
+		No Peripherals match
+}

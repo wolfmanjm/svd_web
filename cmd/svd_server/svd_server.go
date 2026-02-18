@@ -3,6 +3,7 @@ package svd_server
 import (
 	"embed"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -28,7 +29,6 @@ func Server(cstr string, staticFiles embed.FS, port int) error {
 		if hx.IsHtmx(r) {
 			hx.Response(w, hx.Retarget("#contentArea.content"), hx.Reselect(".error"), hx.SwapInnerHtml)
 			http.Error(w, "<div class='error'> Illegal HTMX URL: " + r.RequestURI + "</div>", 200)
-		// hx.Response(w, hx.Redirect("/"))
 		} else if r.RequestURI == "/" {
 			assets.SidebarLayout(db, mpus).Render(r.Context(), w)
 		} else {
@@ -39,6 +39,7 @@ func Server(cstr string, staticFiles embed.FS, port int) error {
 	// serve static files like htmx.js and the css files
 	mux.Handle("/files/", http.FileServerFS(staticFiles))
 
+	// The rest are htmx requests
 	mux.HandleFunc("/peripherals/{id}", func(w http.ResponseWriter, r *http.Request) {
 		if !hx.IsHtmx(r) {
 			http.NotFound(w, r)
@@ -49,11 +50,14 @@ func Server(cstr string, staticFiles embed.FS, port int) error {
 		id, _ := strconv.Atoi(idString)
 		periphs, err := db.GetPeripherals(int32(id))
 		if err != nil {
-			hx.Response(w, hx.Retarget("/"))
+			log.Println("GetPeripherals error: ", err.Error())
+			http.Error(w, "Peripheral Error", 200)
+			//hx.Response(w, hx.Retarget("/"))
 		} else if len(periphs) > 0 {
 			// We have to pass in the db so it can lookup the name of a derived from peripheral
 			assets.ShowPeripherals(db, periphs).Render(r.Context(), w)
 		} else {
+			log.Printf("GetPeripherals not found: %v", id)
 			http.Error(w, "Peripheral not found", 200)
 		}
 	})
@@ -68,12 +72,14 @@ func Server(cstr string, staticFiles embed.FS, port int) error {
 		id, _ := strconv.Atoi(idString)
 		periphs, err := db.FindPeripherals(int32(id), pat)
 		if err != nil {
-			hx.Response(w, hx.Retarget("/"))
+			log.Println("FindPeripherals error: ", err.Error())
+			http.Error(w, "FindPeripherals Error", 200)
+			// hx.Response(w, hx.Retarget("/"))
 		} else if len(periphs) > 0 {
 			// We have to pass in the db so it can lookup the name of a derived from peripheral
 			assets.ShowPeripherals(db, periphs).Render(r.Context(), w)
 		} else {
-			http.Error(w, "No Peripherals match", 200)
+			assets.ShowNoPeripherals(db, id).Render(r.Context(), w)
 		}
 	})
 
@@ -90,6 +96,9 @@ func Server(cstr string, staticFiles embed.FS, port int) error {
 		if err == nil && len(regs) > 0 {
 			assets.ShowRegisters(db, regs).Render(r.Context(), w)
 		} else {
+			if err != nil {
+				log.Println("GetRegisters error: ", err.Error())
+			}
 			http.Error(w, "Register not found", 200)
 		}
 	})
@@ -104,11 +113,13 @@ func Server(cstr string, staticFiles embed.FS, port int) error {
 		id, _ := strconv.Atoi(idString)
 		regs, err := db.FindRegisters(int32(id), pat)
 		if err != nil {
-			hx.Response(w, hx.Retarget("/"))
+			log.Println("FindRegisters error: ", err.Error())
+			http.Error(w, "FindRegisters Error", 200)
+			// hx.Response(w, hx.Retarget("/"))
 		} else if len(regs) > 0 {
 			assets.ShowRegisters(db, regs).Render(r.Context(), w)
 		} else {
-			http.Error(w, "No Registers match", 200)
+			assets.ShowNoRegisters(db, id).Render(r.Context(), w)
 		}
 	})
 
@@ -123,8 +134,10 @@ func Server(cstr string, staticFiles embed.FS, port int) error {
 		if err == nil && len(f) > 0 {
 			assets.ShowFields(db, f).Render(r.Context(), w)
 		} else {
-			http.NotFound(w, r)
-			// http.Error(w, "Peripheral not found", 404)
+			if err != nil {
+				log.Println("GetFields error: ", err.Error())
+			}
+			assets.ShowNoFields(db, id).Render(r.Context(), w)
 		}
 	})
 
@@ -133,7 +146,7 @@ func Server(cstr string, staticFiles embed.FS, port int) error {
 	// })
 
 	portstr := fmt.Sprintf(":%d", port)
-	fmt.Println("Server starting on port: ", portstr)
+	log.Println("Server starting on port: ", portstr)
 	if err := http.ListenAndServe(portstr, mux); err != nil {
 		return err
 	}
