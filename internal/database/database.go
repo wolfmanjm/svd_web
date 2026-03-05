@@ -7,20 +7,19 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/wolfmanjm/svd_web/gen/dbstore"
 )
 
 type Database struct {
 	queries *dbstore.Queries
-	conn    *pgx.Conn
+	conn    *pgxpool.Pool
 	ctx     context.Context
 }
 
 func Setup(cstr string) (*Database, error) {
 	ctx := context.Background()
-
-	conn, err := pgx.Connect(ctx, cstr)
+	conn, err := pgxpool.New(context.Background(), cstr)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +33,7 @@ func Setup(cstr string) (*Database, error) {
 }
 
 func (db *Database) Close() {
-	db.conn.Close(db.ctx)
+	db.conn.Close()
 }
 
 // yet another layer of abstraction
